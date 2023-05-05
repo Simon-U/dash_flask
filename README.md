@@ -5,10 +5,10 @@
 ## Getting started
 
 1. Clone the Repo. `https://gitlab.com/sustainaccount/co2onboard.git`
-2. Move into the docker folder `co2onboard`
+2. Move into the docker folder `cd co2onboard`
 3. Make a virtual enviroment `python3 -m venv env`
 4. Activate the enviroment. On linux `source env/bin/activate`
-5. Install the packages `pip instal -r requirements.txt`
+5. Install the packages `pip install -r requirements.txt`
 6. Start the application `gunicorn -w 2 wsgi:app`
 
 ## Add your files
