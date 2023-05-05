@@ -24,7 +24,7 @@ class Config:
 
     # SMTP
     EMAIL_HOST = environ.get("EMAIL_HOST", "localhost")
-    EMAIL_PORT = environ.get("EMAIL_PORT", 587)
+    EMAIL_PORT = int(environ.get("EMAIL_PORT", 587))
     EMAIL_USERNAME = environ.get("EMAIL_USERNAME", None)
     EMAIL_PASSWORD = environ.get("EMAIL_PASSWORD", None)
     EMAIL_SENDER = environ.get("EMAIL_SENDER", None)
