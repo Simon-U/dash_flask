@@ -7,10 +7,42 @@
     <meta name="description" content={{description}}>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='/img/favicon.ico') }}">
+
+
+    <script>
+        $('#myModal').on('shown.bs.modal', function () {
+            $('#myInput').trigger('focus');
+        })
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#sent_email').click(function () {
+                var email = $('#resetemail').val();
+                if (email != '') {
+                    console.log(email)
+                    $.ajax({
+                        url: "/reset",
+                        method: "POST",
+                        data: { email: email },
+                        success: function (data) {
+                            $('#myModal').hide();
+                            location.reload();
+                        }
+                    });
+                }
+                else {
+                    alert("Please provide an Email");
+                }
+            });
+        });  
+    </script>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css">
 </head>
 
-<body>
+<body
+    style="background-image: url({{ url_for('static', filename='img/mes_background.jpg') }}); background-size: cover; opacity:0.95;">
     {% block content %}
     {% endblock %}
 </body>

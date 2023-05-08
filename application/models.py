@@ -34,4 +34,4 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password, password)
 
     def __repr__(self):
-        return "<User {}>".format(self.name)
+        return "<User {}>".format(self.email)

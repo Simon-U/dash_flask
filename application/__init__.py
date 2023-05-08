@@ -6,16 +6,19 @@ from flask_session import Session
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_redmail import RedMail
 from flask_admin import Admin
-from flask_admin.contrib.sqla import ModelView
-from flask_admin.contrib.fileadmin import FileAdmin
 import os.path as op
+from .templates.admin.custom_views import (
+    customFileAdmin,
+    customModelView,
+    MyAdminIndexView,
+)
 
 db = SQLAlchemy()
 login_manager = LoginManager()
 mail = RedMail()
 
 
-admin_manager = Admin(template_mode="bootstrap4")
+admin_manager = Admin(template_mode="bootstrap4", index_view=MyAdminIndexView())
 path = op.join(op.dirname(__file__), "data")
 
 
@@ -43,8 +46,8 @@ def create_app():
         # Register admin views for managing user and uploading files
         from .models import User
 
-        admin_manager.add_view(ModelView(User, db.session))
-        admin_manager.add_view(FileAdmin(path, name="Excel Tables"))
+        admin_manager.add_view(customModelView(User, db.session))
+        admin_manager.add_view(customFileAdmin(path, name="Excel Tables"))
 
         # Register Blueprints, which are layouts
         app.register_blueprint(auth.auth_bp)

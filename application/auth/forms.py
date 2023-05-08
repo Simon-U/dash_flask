@@ -43,3 +43,22 @@ class LoginForm(FlaskForm):
     )
     password = PasswordField("Password", validators=[DataRequired()])
     submit = SubmitField("Log In")
+
+
+class ResetPasswordForm(FlaskForm):
+    """User Sign-up Form."""
+
+    password = PasswordField(
+        "Password",
+        validators=[
+            DataRequired(),
+            Length(min=6, message="Select a stronger password."),
+        ],
+    )
+    confirm = PasswordField(
+        "Confirm Your Password",
+        validators=[
+            DataRequired(),
+            EqualTo("password", message="Passwords must match."),
+        ],
+    )

@@ -4888,8 +4888,6 @@ input[type="button"].btn-block {
 
 .navbar-brand {
   display: inline-block;
-  padding-top: 0.347656rem;
-  padding-bottom: 0.347656rem;
   margin-right: 1rem;
   font-size: 1.015625rem;
   line-height: inherit;
@@ -5943,11 +5941,16 @@ a.badge-dark.focus {
 }
 
 .alert {
-  position: relative;
+  position: absolute;
   padding: 0.75rem 1.25rem;
   margin-bottom: 1rem;
   border: 1px solid transparent;
   border-radius: 0.25rem;
+  top: 3px;
+  left: 30%;
+  right: 30%;
+  z-index: 999;
+  font-size: larger;
 }
 
 .alert-heading {
@@ -6744,6 +6747,7 @@ a.close.disabled {
   width: 100vw;
   height: 100vh;
   background-color: #000;
+  opacity: 0.5;
 }
 
 .modal-backdrop.fade {
