@@ -4,7 +4,7 @@ import re
 from flask import session, current_app
 
 import dash_mantine_components as dmc
-from dash import html, callback, Output, Input, ALL, State
+from dash import html, callback, Output, Input, ALL, State, ctx
 from dash_iconify import DashIconify
 
 from .components.navbar import navbar
@@ -27,41 +27,58 @@ def make_tabs(tab_names):
 base_layout = dmc.MantineProvider(
     theme={},
     inherit=True,
-    children=[
-        dmc.Grid(
-            children=[
-                modalPasswordChange,
-                navbar,
-                dmc.Col(
-                    dmc.Tabs(
-                        make_tabs(get_co2model.get_model_names()),
-                        value=get_co2model.get_model_names()[0],
-                        placement="left",
-                        orientation="vertical",
-                        id="tabs",
+    children=dmc.NotificationsProvider(
+        [
+            dmc.Grid(
+                children=[
+                    modalPasswordChange,
+                    navbar,
+                    dmc.Col(
+                        [
+                            dmc.Tabs(
+                                make_tabs(get_co2model.get_model_names()),
+                                value=get_co2model.get_model_names()[0],
+                                placement="left",
+                                orientation="vertical",
+                                id="tabs",
+                            ),
+                            dmc.Space(h=20),
+                            dmc.Button(
+                                "Save Settings",
+                                id="save-settings",
+                                n_clicks=0,
+                                className="btn btn-primary btn-block",
+                                style={"max-width": "13em"},
+                                leftIcon=DashIconify(
+                                    icon="fluent:database-plug-connected-20-filled"
+                                ),
+                            ),
+                            dmc.Text(id="test"),
+                        ],
+                        span=2,
                     ),
-                    span=2,
-                ),
-                dmc.Col(html.Div(id="tabs-content"), span=10),
-                dmc.Footer(
-                    height=60,
-                    children=[
-                        dmc.Anchor(
-                            "Privacy Policy",
-                            href=current_app.config.get("URL_PRIVACY_POLICY"),
-                            refresh=True,
-                            target="_blank",
-                            className="privacy",
-                        ),
-                    ],
-                    className="footer_privacy",
-                    style={"width": "100%", "border": "none"},
-                ),
-            ],
-            gutter="xl",
-            style={"margin": "0", "max-width": "100%", "background-color": "none"},
-        ),
-    ],
+                    dmc.Col(html.Div(id="tabs-content"), span=10),
+                    html.Div(id="notifications-container"),
+                    dmc.Footer(
+                        height=60,
+                        children=[
+                            dmc.Anchor(
+                                "Privacy Policy",
+                                href=current_app.config.get("URL_PRIVACY_POLICY"),
+                                refresh=True,
+                                target="_blank",
+                                className="privacy",
+                            ),
+                        ],
+                        className="footer_privacy",
+                        style={"width": "100%", "border": "none"},
+                    ),
+                ],
+                gutter="xl",
+                style={"margin": "0", "max-width": "100%", "background-color": "none"},
+            ),
+        ],
+    ),
 )
 
 
@@ -138,25 +155,34 @@ def update_graph(current_tab, input_weigts):
     )
     data_processing = load_module(file_name_processing, processing)
 
-    if len(input_weigts) > 0:
+    if ctx.triggered_id is None:
+        excel_file = os.path.join(os.getcwd(), "application/data", file_name_excel)
+        weights = get_user.get_user_preferences(session["user"].get("id"), current_tab)
+        df = data_processing.get_data(excel_file, weights)
+        return create_table(df, list(weights.values()))
+
+    elif ctx.triggered_id == "tabs":
+        excel_file = os.path.join(os.getcwd(), "application/data", file_name_excel)
+        weights = get_user.get_user_preferences(session["user"].get("id"), current_tab)
+        df = data_processing.get_data(excel_file, weights)
+        return create_table(df, list(weights.values()))
+
+    elif len(input_weigts) > 0:
         weights = get_user.get_user_preferences(session["user"].get("id"), current_tab)
         weights_new = dict(zip(list(weights.keys()), input_weigts))
 
         df = data_processing.get_data(excel_file, weights_new)
         return create_table(df, weights_new)
 
-    else:
-        excel_file = os.path.join(os.getcwd(), "application/data", file_name_excel)
-        weights = get_user.get_user_preferences(session["user"].get("id"), current_tab)
-
-        df = data_processing.get_data(excel_file, weights)
-        return create_table(df, list(weights.values()))
-
 
 @callback(
     Output("old-password", "error"),
     Output("new-password", "error"),
     Output("modal-change-password", "opened"),
+    Output("notifications-container", "children", allow_duplicate=True),
+    Output("old-password", "value"),
+    Output("new-password", "value"),
+    Output("confirm-new-password", "value"),
     Input("button-change-password", "n_clicks"),
     Input("submitt-password-change", "n_clicks"),
     State("old-password", "value"),
@@ -167,18 +193,78 @@ def update_graph(current_tab, input_weigts):
 )
 def change_password(open, n_clicks, oldPassword, newPassword, confirmNew, opened):
     if not opened:
-        return False, False, not opened
+        return False, False, not opened, "", oldPassword, newPassword, confirmNew
 
     pattern = re.compile("^((?=.*\d)(?=.*[A-Z])(?=.*\W).{8,20})$")
 
     if not get_user.check_password(session["user"].get("id"), oldPassword):
-        return "The old password is incorrect", False, opened
+        return (
+            "The old password is incorrect",
+            False,
+            opened,
+            "",
+            oldPassword,
+            newPassword,
+            confirmNew,
+        )
 
     if not pattern.match(newPassword):
-        return False, "The new password does not match the criteria", opened
+        return (
+            False,
+            "The new password does not match the criteria",
+            opened,
+            "",
+            oldPassword,
+            newPassword,
+            confirmNew,
+        )
 
     if confirmNew != newPassword:
-        return False, "New password and confirmation does not match", opened
+        return (
+            False,
+            "New password and confirmation does not match",
+            opened,
+            "",
+            oldPassword,
+            newPassword,
+            confirmNew,
+        )
 
     get_user.change_password(session["user"].get("id"), newPassword)
-    return False, False, not opened
+
+    message = dmc.Notification(
+        title="Hey there!",
+        id="simple-notify",
+        action="show",
+        message="The password was changed successfully",
+        icon=DashIconify(icon="ic:round-celebration"),
+    )
+    return False, False, not opened, message, "", "", ""
+
+
+@callback(
+    Output("notifications-container", "children"),
+    Input("save-settings", "n_clicks"),
+    State({"type": "table-input", "index": ALL}, "value"),
+    State("tabs", "value"),
+    prevent_initial_call=True,
+)
+def save_settings(n_clicks, weigths, current_tab):
+    if n_clicks:
+        current_weigths = get_user.get_user_preferences(
+            session["user"].get("id"), current_tab
+        )
+        temp = [str(weight) for weight in weigths]
+
+        new_weigts = dict(zip(list(current_weigths.keys()), temp))
+        get_user.save_user_preferences(
+            session["user"].get("id"), current_tab, new_weigts
+        )
+        message = dmc.Notification(
+            title="Hey there!",
+            id="simple-notify",
+            action="show",
+            message="Your settings are saved successfully",
+            icon=DashIconify(icon="ic:round-celebration"),
+        )
+        return message

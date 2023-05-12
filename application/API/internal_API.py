@@ -1,5 +1,6 @@
 from flask import current_app, session
 from application.models import User, db, co2model
+import json
 
 
 class get_co2model:
@@ -36,9 +37,10 @@ class get_user:
     def get_user_preferences(user_id, model):
         return {
             key: int(value)
-            for key, value in User.query.filter_by(id=user_id)
-            .first()
-            .preferences.get(model)
+            for key, value in json.loads(
+                User.query.filter_by(id=user_id).first().preferences
+            )
+            .get(model)
             .items()
         }
 
@@ -51,3 +53,16 @@ class get_user:
         user.set_password(newpassword)
         db.session.commit()
         return "changed"
+
+    def save_user_preferences(user_id, model, weights):
+        user = User.query.filter_by(id=user_id).first()
+        dict_pref = json.loads(user.preferences)
+
+        dict_pref[model] = weights
+        user.preferences = json.dumps(dict_pref)
+
+        try:
+            db.session.commit()
+        except Exception as e:
+            print(e)
+        return "chaged"

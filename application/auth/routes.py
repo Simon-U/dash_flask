@@ -1,6 +1,6 @@
 import datetime
 import jwt
-
+import json
 from flask import Blueprint, render_template
 from flask import current_app
 from flask import (
@@ -28,7 +28,7 @@ auth_bp = Blueprint(
 
 
 def update_preferences(user):
-    current_preferences = (
+    current_preferences = json.loads(
         User.query.with_entities(User.preferences).filter_by(id=user.id).first()[0]
     )
     if current_preferences is None:
@@ -38,6 +38,7 @@ def update_preferences(user):
         list(pref[0].keys())[0]: list(pref[0].values())[0]
         for pref in co2model.query.with_entities(co2model.inital_preferences).all()
     }
+
     if inital_preferences is None:
         inital_preferences = {}
     try:
