@@ -17,15 +17,24 @@ class Config:
     TEMPLATES_FOLDER = "templates"
     FLASK_PORT = environ.get("FLASK_PORT", "8080")
 
+    # Admin User
+    ADMIN_FIRST_NAME = environ.get("ADMIN_FIRST_NAME")
+    ADMIN_LAST_NAME = environ.get("ADMIN_LAST_NAME")
+    ADMIN_EMAIL = environ.get("ADMIN_EMAIL")
+    ADMIN_PASSWORD = environ.get("ADMIN_PASSWORD")
+
     # URLS
     URL_BASE = "/"
     URL_LOGIN = "/login"
     URL_SIGNUP = "/signup"
     URL_RESET_PASSWORD = "/reset"
-    URL_CHANGE_PASSWORD = "/change-password/<token>"
+    URL_NEW_PASSWORD = "/new-password/<token>"
+    URL_CHANGE_PASSWORD = "/change-password"
     URL_LOGOUT = "/logout"
     URL_VERIFY_EMAIL = "/vefify-email/<token>"
     URL_DASH = "/dash/"
+    URL_USER_PREFERENCES = "/userpreferences"
+    URL_PRIVACY_POLICY = "/privacy_policy"
 
     # Database
     SQLALCHEMY_DATABASE_URI = environ.get("DATABASE_URI", "sqlite:///database.db")

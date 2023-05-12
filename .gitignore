@@ -1,6 +1,6 @@
 env
 .vscode
 __pycache__
+ /__pycache__/
 .idea
 instance/*
-instance/database.db

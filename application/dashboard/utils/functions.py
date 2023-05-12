@@ -1,8 +1,9 @@
+import importlib
 import os
 
 
-def get_tab_names():
-    excel_files = os.path.join(os.getcwd(), "application/data")
-    list = os.listdir(excel_files)
-    files = [f.split(".")[0] for f in list if os.path.isfile(excel_files + "/" + f)]
-    return files
+def load_module(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    data_processing = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(data_processing)
+    return data_processing

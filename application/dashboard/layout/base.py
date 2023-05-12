@@ -1,18 +1,16 @@
-import glob
-import importlib
 import os
-from datetime import date
+import re
+
+from flask import session, current_app
 
 import dash_mantine_components as dmc
-from dash import Dash, html, dash_table, dcc, callback, Output, Input, ALL
-import pandas as pd
-
-from ..utils.functions import get_tab_names
-from .components.navbar import navbar
-import importlib
-import pathlib
-from ...data.processing.main import get_data
+from dash import html, callback, Output, Input, ALL, State
 from dash_iconify import DashIconify
+
+from .components.navbar import navbar
+from .components.modalPassword import modalPasswordChange
+from ...API.internal_API import get_co2model, get_user
+from ..utils.functions import load_module
 
 
 def make_tabs(tab_names):
@@ -27,42 +25,42 @@ def make_tabs(tab_names):
 
 
 base_layout = dmc.MantineProvider(
-    theme={
-        "fontFamily": "'Inter', sans-serif",
-        "primaryColor": "indigo",
-        "margin": "0px",
-        "max-width": "100%",
-        "components": {
-            "Container": {"styles": {"maw": "100%"}},
-            "Button": {"styles": {"root": {"fontWeight": 400}}},
-            "Alert": {"styles": {"title": {"fontWeight": 500}}},
-            "AvatarGroup": {"styles": {"truncated": {"fontWeight": 500}}},
-        },
-    },
+    theme={},
     inherit=True,
     children=[
-        dmc.Container(
-            dmc.Grid(
-                children=[
-                    navbar,
-                    dmc.Col(
-                        dmc.Tabs(
-                            make_tabs(get_tab_names()),
-                            value=get_tab_names()[0],
-                            placement="left",
-                            orientation="vertical",
-                            id="tabs",
-                        ),
-                        span=2,
+        dmc.Grid(
+            children=[
+                modalPasswordChange,
+                navbar,
+                dmc.Col(
+                    dmc.Tabs(
+                        make_tabs(get_co2model.get_model_names()),
+                        value=get_co2model.get_model_names()[0],
+                        placement="left",
+                        orientation="vertical",
+                        id="tabs",
                     ),
-                    dmc.Col(html.Div(id="tabs-content"), span=10),
-                ],
-                gutter="xl",
-                grow=True,
-                style={"margin": 0, "max-width": "100%"},
-            ),
-            style={"margin": 0, "max-width": "100%"},
-        )
+                    span=2,
+                ),
+                dmc.Col(html.Div(id="tabs-content"), span=10),
+                dmc.Footer(
+                    height=60,
+                    children=[
+                        dmc.Anchor(
+                            "Privacy Policy",
+                            href=current_app.config.get("URL_PRIVACY_POLICY"),
+                            refresh=True,
+                            target="_blank",
+                            className="privacy",
+                        ),
+                    ],
+                    className="footer_privacy",
+                    style={"width": "100%", "border": "none"},
+                ),
+            ],
+            gutter="xl",
+            style={"margin": "0", "max-width": "100%", "background-color": "none"},
+        ),
     ],
 )
 
@@ -89,7 +87,15 @@ def create_table(df, weights):
     rows = [
         html.Tr(
             [
-                html.Td(cell)
+                #  ToDo Tooltip needs to be adjusted based onlist/dict
+                html.Td(
+                    dmc.Tooltip(
+                        label="This is a tooltip",
+                        position="left",
+                        offset=3,
+                        children=cell,
+                    )
+                )
                 if ind == 0
                 else html.Td(
                     dmc.NumberInput(
@@ -122,43 +128,57 @@ def create_table(df, weights):
     Input({"type": "table-input", "index": ALL}, "value"),
 )
 def update_graph(current_tab, input_weigts):
-    weights = {
-        "Technologie Readiness Level": 5,
-        "verwendeter Kraftstoff": 6,
-        "behandelte Rauchgasmenge": 7,
-        "CO2 Rauchgaskonzentration": 3,
-        "Anlage Eingangsdruck": 4,
-        "Eingangs Prozesstemperatur": 5,
-        "CO2 Reinheit": 3,
-        "CO2 Abscheiderate": 7,
-        "CO2 Temperatur vor Speicherung": 4,
-        "Energiebedarf elektrisch": 9,
-        "Energiebedarf thermisch": 7,
-        "Prozessmittelverbrauch": 3,
-        "Abgasvorbehandlung": 10,
-        "Platzbedarf": 7,
-    }
+    file_name_excel = get_co2model.get_data_file(current_tab)
+    excel_file = os.path.join(os.getcwd(), "application/data", file_name_excel)
 
-    list_tabs = get_tab_names()
-    for tab in list_tabs:
-        if current_tab == tab:
-            if len(input_weigts) > 0:
-                excel_file = os.path.join(
-                    os.getcwd(), "application/data", f"{current_tab}.xlsx"
-                )
-                weights_new = dict(zip(list(weights.keys()), input_weigts))
+    # loading the module at runtime
+    file_name_processing = get_co2model.get_processing_file(current_tab)
+    processing = os.path.join(
+        os.getcwd(), "application/data/processing", file_name_processing
+    )
+    data_processing = load_module(file_name_processing, processing)
 
-                # ToDo Import the data function dynamically
+    if len(input_weigts) > 0:
+        weights = get_user.get_user_preferences(session["user"].get("id"), current_tab)
+        weights_new = dict(zip(list(weights.keys()), input_weigts))
 
-                df = get_data(excel_file, weights_new)
-                return create_table(df, weights_new)
+        df = data_processing.get_data(excel_file, weights_new)
+        return create_table(df, weights_new)
 
-            else:
-                excel_file = os.path.join(
-                    os.getcwd(), "application/data", f"{current_tab}.xlsx"
-                )
+    else:
+        excel_file = os.path.join(os.getcwd(), "application/data", file_name_excel)
+        weights = get_user.get_user_preferences(session["user"].get("id"), current_tab)
 
-                # ToDo Import the data function dynamically
+        df = data_processing.get_data(excel_file, weights)
+        return create_table(df, list(weights.values()))
 
-                df = get_data(excel_file, weights)
-                return create_table(df, list(weights.values()))
+
+@callback(
+    Output("old-password", "error"),
+    Output("new-password", "error"),
+    Output("modal-change-password", "opened"),
+    Input("button-change-password", "n_clicks"),
+    Input("submitt-password-change", "n_clicks"),
+    State("old-password", "value"),
+    State("new-password", "value"),
+    State("confirm-new-password", "value"),
+    State("modal-change-password", "opened"),
+    prevent_initial_call=True,
+)
+def change_password(open, n_clicks, oldPassword, newPassword, confirmNew, opened):
+    if not opened:
+        return False, False, not opened
+
+    pattern = re.compile("^((?=.*\d)(?=.*[A-Z])(?=.*\W).{8,20})$")
+
+    if not get_user.check_password(session["user"].get("id"), oldPassword):
+        return "The old password is incorrect", False, opened
+
+    if not pattern.match(newPassword):
+        return False, "The new password does not match the criteria", opened
+
+    if confirmNew != newPassword:
+        return False, "New password and confirmation does not match", opened
+
+    get_user.change_password(session["user"].get("id"), newPassword)
+    return False, False, not opened

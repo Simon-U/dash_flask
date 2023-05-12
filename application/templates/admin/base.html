@@ -43,7 +43,7 @@
 <body>
     {% block page_body %}
     <div class="container{% if config.get('FLASK_ADMIN_FLUID_LAYOUT', False) %}-fluid{% endif %}"
-        style="margin-top: 5px; max-width: 100%">
+        style="max-width: 100%; padding: 0;">
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-2" role="navigation" , style="padding: 0;">
             <!-- Brand and toggle get grouped for better mobile display -->
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#admin-navbar-collapse"
@@ -63,12 +63,19 @@
                 {% endblock %}
 
                 {% block menu_links %}
-                <ul class="nav navbar-nav navbar-right" style="padding-right: 10px;">
-                    <li>
-                        <a class="nav-link" href="/logout" target="blank">
-                            Logout</a>
-                    </li>
-                </ul>
+
+                <div class="nav navbar-nav dropdown" style="padding-right: 5em;">
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button"
+                        aria-haspopup="true" aria-expanded="true"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+                            height="24" viewBox="0 0 24 24">
+                            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0-8 0M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
+                        </svg></a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="/logout">Logout</a>
+                    </div>
+                </div>
                 {% endblock %}
                 {% block access_control %}
                 {% endblock %}

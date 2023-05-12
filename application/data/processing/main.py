@@ -2,22 +2,6 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 
-weights = {
-    "Technologie Readiness Level": 5,
-    "verwendeter Kraftstoff": 6,
-    "behandelte Rauchgasmenge": 7,
-    "CO2 Rauchgaskonzentration": 3,
-    "Anlage Eingangsdruck": 4,
-    "Eingangs Prozesstemperatur": 5,
-    "CO2 Reinheit": 3,
-    "CO2 Abscheiderate": 7,
-    "CO2 Temperatur vor Speicherung": 4,
-    "Energiebedarf elektrisch": 9,
-    "Energiebedarf thermisch": 7,
-    "Prozessmittelverbrauch": 3,
-    "Abgasvorbehandlung": 10,
-    "Platzbedarf": 7,
-}
 
 
 def get_data(file_path, weights):

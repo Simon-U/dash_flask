@@ -17,7 +17,7 @@ from flask import (
 from flask_login import login_required, logout_user, current_user, login_user
 
 from application import login_manager
-from application.models import User, db
+from application.models import User, co2model, db
 from .forms import LoginForm, SignupForm, ResetPasswordForm
 from .. import mail
 
@@ -25,6 +25,54 @@ from .. import mail
 auth_bp = Blueprint(
     "auth_bp", __name__, template_folder="templates", static_folder="application/static"
 )
+
+
+def update_preferences(user):
+    current_preferences = (
+        User.query.with_entities(User.preferences).filter_by(id=user.id).first()[0]
+    )
+    if current_preferences is None:
+        current_preferences = {}
+
+    inital_preferences = {
+        list(pref[0].keys())[0]: list(pref[0].values())[0]
+        for pref in co2model.query.with_entities(co2model.inital_preferences).all()
+    }
+    if inital_preferences is None:
+        inital_preferences = {}
+    try:
+        current_keys = list(current_preferences.keys())
+    except:
+        current_keys = []
+
+    try:
+        inital_keys = list(inital_preferences.keys())
+    except:
+        inital_keys = []
+
+    # Check if user is missing preferences for one model
+    for key in inital_keys:
+        if key not in current_keys:
+            current_preferences[key] = inital_preferences.get(key)
+            user.preferences = current_preferences
+            db.session.commit()
+
+    # Check if user has preferences for a model which does not exists anymore
+    for key in current_keys:
+        if key not in inital_keys:
+            del current_preferences[key]
+            user.preferences = current_preferences
+            db.session.commit()
+
+
+def flash_errors(form):
+    """Flashes form errors"""
+    for field, errors in form.errors.items():
+        for error in errors:
+            flash(
+                f"Error for {field} field: {error}",
+                "warning",
+            )
 
 
 @login_manager.user_loader
@@ -55,6 +103,7 @@ def login():
     loginForm = LoginForm()
 
     if current_user.is_authenticated:
+        update_preferences(current_user)
         # Log the new last login
         current_user.last_login = datetime.datetime.now()
         db.session.commit()
@@ -84,7 +133,7 @@ def login():
             .filter_by(email=loginForm.email.data)
             .first()
         )[0]
-
+        update_preferences(user)
         # Check if the user is verified
         if not user.verified:
             flash(
@@ -149,6 +198,13 @@ def signup():
         flash("A user already exists with that email address.", category="warning")
 
         if existing_user is None:
+            preferences = co2model.query.with_entities(
+                co2model.inital_preferences
+            ).all()
+            preferences_json = {
+                list(pref[0].keys())[0]: list(pref[0].values())[0]
+                for pref in preferences
+            }
             user = User(
                 first_name=form.first_name.data,
                 last_name=form.last_name.data,
@@ -156,6 +212,7 @@ def signup():
                 is_admin=form.is_admin.data,
                 verified=False,
                 created=datetime.datetime.now(),
+                preferences=preferences_json,
             )
             user.set_password(form.password.data)
             db.session.add(user)
@@ -194,6 +251,9 @@ def signup():
                 print(e)
 
             return redirect(url_for("auth_bp.login"))
+
+    else:
+        flash_errors(form)
 
     return render_template(
         "signup.jinja2",
@@ -255,7 +315,7 @@ def reset_password():
     return jsonify("This Email is not registered")
 
 
-@auth_bp.route(current_app.config["URL_CHANGE_PASSWORD"], methods=["GET", "POST"])
+@auth_bp.route(current_app.config["URL_NEW_PASSWORD"], methods=["GET", "POST"])
 def change_password(token):
     form = ResetPasswordForm()
     try:
@@ -284,4 +344,13 @@ def change_password(token):
         title="Change Password",
         form=form,
         body="Change the password of your account",
+    )
+
+
+@auth_bp.route(current_app.config["URL_PRIVACY_POLICY"], methods=["GET", "POST"])
+def privacy_policy():
+    return render_template(
+        "privacy_policy.html",
+        title="Privacy Policy",
+        body="Privacy Policy",
     )

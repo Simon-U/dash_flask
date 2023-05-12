@@ -20,11 +20,9 @@ class customFileAdmin(FileAdmin):
 
 
 class customModelView(ModelView):
-    column_exclude_list = [
-        "password",
-    ]
     form_excluded_columns = [
         "password",
+        'preferences',
     ]
 
     @expose()

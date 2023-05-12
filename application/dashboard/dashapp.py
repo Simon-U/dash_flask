@@ -29,7 +29,7 @@ def create_dashapp(server):
         __name__,
         server=server,
         url_base_pathname=current_app.config["URL_DASH"],
-        assets_folder=assets_path,
+        # assets_folder=assets_path,
     )
     app._favicon = f"{assets_path}/img/favicon.ico"
     app.config["suppress_callback_exceptions"] = True

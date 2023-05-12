@@ -1,5 +1,6 @@
 <!doctype html>
-<html>
+<html
+    style="min-heigh:100%; background-image: url({{ url_for('static', filename='img/mes_background.jpg') }}); background-size: cover;">
 
 <head>
     <title>{{title}}</title>
@@ -8,6 +9,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link rel="shortcut icon" href="{{ url_for('static', filename='/img/favicon.ico') }}">
+
 
 
     <script>
@@ -41,10 +43,14 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css">
 </head>
 
-<body
-    style="background-image: url({{ url_for('static', filename='img/mes_background.jpg') }}); background-size: cover; opacity:0.95;">
+<body style="background: none; opacity:0.95;">
     {% block content %}
     {% endblock %}
+
+    <footer class="footer_privacy">
+        <a href="/privacy_policy" target="_blank" class="privacy">Privacy
+            Policy</a>
+    </footer>
 </body>
 
 </html>

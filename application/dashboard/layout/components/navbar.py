@@ -1,48 +1,47 @@
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
+from flask import current_app
 
 
-def get_icon(icon):
-    return DashIconify(icon=icon, height=16)
+def get_icon(icon, height=16):
+    return DashIconify(icon=icon, height=height)
 
 
-navbar = dmc.Navbar(
+navbar = dmc.Col(
     [
-        dmc.Grid(
+        dmc.Image(src="/static/img/mes_rgb.png", width=300),
+        dmc.Menu(
             [
-                dmc.Col(
-                    dmc.Image(src="/static/img/mes_rgb.png", width=300), span="content"
-                ),
-                dmc.Col(
-                    dmc.Menu(
-                        [
-                            dmc.MenuTarget(
-                                dmc.ActionIcon(get_icon(icon="tabler:user"))
-                            ),
-                            dmc.MenuDropdown(
-                                [
-                                    dmc.MenuItem(
-                                        "Logout",
-                                        href="/logout",
-                                        refresh=True,
-                                        icon=DashIconify(icon="tabler:logout"),
-                                    ),
-                                ]
-                            ),
-                        ]
+                dmc.MenuTarget(
+                    dmc.Anchor(
+                        get_icon(icon="tabler:user", height=24),
+                        className="nav-link dropdown-toggle",
+                        href="",
                     ),
-                    span=2,
-                    style={
-                        "display": "flex",
-                        "justify-content": "center",
-                        "align-items": "center",
-                    },
+                ),
+                dmc.MenuDropdown(
+                    [
+                        dmc.MenuItem(
+                            "Change Password", id="button-change-password", n_clicks=0
+                        ),
+                        dmc.MenuItem(
+                            "Logout",
+                            href=current_app.config.get("URL_LOGOUT"),
+                            refresh=True,
+                        ),
+                    ],
                 ),
             ],
-            justify="space-between",
-            gutter="xl",
-        )
+            style={"padding-right": "5em"},
+            className="nav navbar-nav dropdown",
+        ),
     ],
-    height="auto",
-    style={"marginTop": "5px", "width": "100%", "background-color": "var(--mes_blue)"},
+    style={
+        "background": "none",
+        "padding": "0",
+        "margin": "0",
+        "display": "flex",
+        "justify-content": "space-between",
+    },
+    className="navbar navbar-expand-lg navbar-dark bg-primary mb-2",
 )
