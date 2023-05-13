@@ -18,7 +18,10 @@ def make_base_layout(app):
                         modalPasswordChange,
                         navbar.embed(app),
                         html.Div(id="notifications-container"),
-                        page_container,
+                        html.Div(
+                            page_container,
+                            style={"padding": "2em"},
+                        ),
                         dmc.Footer(
                             height=60,
                             children=[

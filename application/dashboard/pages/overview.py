@@ -15,31 +15,46 @@ overview = DashBlueprint()
 overview.layout = dmc.Grid(
     [
         dmc.Col(
-            [
-                dmc.Tabs(
-                    make_tabs(get_co2model.get_model_names()),
-                    value=get_co2model.get_model_names()[0],
-                    placement="left",
-                    orientation="vertical",
-                    id="tabs",
-                ),
-                dmc.Space(h=20),
-                dmc.Button(
-                    "Save Settings",
-                    id="save-settings",
-                    n_clicks=0,
-                    className="btn btn-primary btn-block",
-                    style={"max-width": "13em"},
-                    leftIcon=DashIconify(
-                        icon="fluent:database-plug-connected-20-filled"
+            dmc.Paper(
+                [
+                    dmc.Tabs(
+                        make_tabs(get_co2model.get_model_names()),
+                        value=get_co2model.get_model_names()[0],
+                        placement="left",
+                        orientation="vertical",
+                        id="tabs",
                     ),
-                ),
-                dmc.Text(id="test"),
-            ],
+                    dmc.Space(h=20),
+                    dmc.Button(
+                        "Save Settings",
+                        id="save-settings",
+                        n_clicks=0,
+                        className="btn btn-primary btn-block",
+                        style={"max-width": "13em"},
+                        leftIcon=DashIconify(
+                            icon="fluent:database-plug-connected-20-filled"
+                        ),
+                    ),
+                    dmc.Text(id="test"),
+                ],
+                radius="lg",
+                p="xs",
+                style={"box-shadow": "4px 5px 21px -3px rgba(66, 68, 90, 1)"},
+            ),
             span=2,
         ),
-        dmc.Col(html.Div(id="tabs-content"), span=10),
-    ]
+        dmc.Col(
+            dmc.Paper(
+                html.Div(id="tabs-content"),
+                radius="lg",
+                style={"box-shadow": "4px 5px 21px -3px rgba(66, 68, 90, 1)"},
+                p="xs",
+            ),
+            span=10,
+        ),
+    ],
+    gutter="xl",
+    style={"padding-bottom": "60px"},
 )
 
 

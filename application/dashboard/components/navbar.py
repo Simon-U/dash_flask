@@ -49,6 +49,7 @@ navbar.layout = dmc.Col(
         "margin": "0",
         "display": "flex",
         "justify-content": "space-between",
+        "box-shadow": "2px 6px 14px 7px rgba(0,0,0,0.3)",
     },
     className="navbar navbar-expand-lg navbar-dark bg-primary mb-2",
 )
