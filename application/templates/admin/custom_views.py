@@ -23,6 +23,9 @@ class customModelView(ModelView):
     form_excluded_columns = [
         "password",
     ]
+    column_exclude_list = [
+        "password",
+    ]
 
     @expose()
     def index(self):
