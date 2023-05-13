@@ -4,8 +4,8 @@ from flask import session, current_app
 from dash_iconify import DashIconify
 import dash_mantine_components as dmc
 from dash_extensions.enrich import DashBlueprint, Output, Input, State
-import dash_mantine_components as dmc
 from dash_iconify import DashIconify
+from dash import html, page_registry
 
 from ..utils.functions import get_icon
 from ...API.internal_API import get_user
@@ -14,9 +14,21 @@ from ...API.internal_API import get_user
 navbar = DashBlueprint()
 
 
+def nav_tabs():
+    # ToDo needs reqork
+    return [
+        dmc.NavLink(
+            label=page["name"], href=page["path"], className="nav navbar-nav mr-auto"
+        )
+        for page in page_registry.values()
+    ]
+
+
 navbar.layout = dmc.Col(
     [
-        dmc.Image(src="/static/img/mes_rgb.png", width=300),
+        html.Div(
+            dmc.Image(src="/static/img/mes_rgb.png", width=300),
+        ),
         dmc.Menu(
             [
                 dmc.MenuTarget(

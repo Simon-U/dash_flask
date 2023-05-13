@@ -11,9 +11,36 @@ def make_base_layout(app):
     base_layout = dmc.MantineProvider(
         theme={
             "components": {
+                "Grid": {
+                    "style": {
+                        "root": {
+                            "padding": "0em",
+                        }
+                    },
+                },
                 "Paper": {
                     "styles": {
-                        "root": {"box-shadow": "4px 5px 21px -3px rgba(66, 68, 90, 1)"}
+                        "root": {
+                            "box-shadow": "4px 5px 21px -3px rgba(66, 68, 90, 1)",
+                            "padding": "1em",
+                        }
+                    },
+                },
+                "Chip": {
+                    "styles": {
+                        "root": {},
+                        "label": {"border": "none", "font-size": "large", "gap": "0px"},
+                    }
+                },
+                "ChipGroup": {
+                    "styles": {
+                        "root": {
+                            "padding": "0",
+                            "margin": "0",
+                            "row-gap": 0,
+                            "column-gap": 0,
+                        },
+                        "label": {},
                     }
                 },
             },
@@ -29,20 +56,6 @@ def make_base_layout(app):
                         html.Div(
                             page_container,
                             style={"padding": "2em"},
-                        ),
-                        dmc.Footer(
-                            height=60,
-                            children=[
-                                dmc.Anchor(
-                                    "Privacy Policy",
-                                    href=current_app.config.get("URL_PRIVACY_POLICY"),
-                                    refresh=True,
-                                    target="_blank",
-                                    className="privacy",
-                                ),
-                            ],
-                            className="footer_privacy",
-                            style={"width": "100%", "border": "none"},
                         ),
                     ],
                     gutter="xl",

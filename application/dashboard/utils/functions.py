@@ -1,8 +1,13 @@
 import importlib
+import json
+import pandas as pd
+import plotly.express as px
+import pandas as pd
 
 import dash_mantine_components as dmc
 from dash import html
 from dash_iconify import DashIconify
+from ...API.external_API import yahoo_finance
 
 
 def load_module(name, path):
@@ -120,3 +125,106 @@ def create_table(df, weights):
         children=[html.Thead(header), html.Tbody(rows)],
     )
     return table
+
+
+def make_performance_color(close_price, performance):
+    if performance < 0:
+        return dmc.Col(
+            [dmc.Text(f"{close_price} ({performance}%)")],
+            style={"color": "red", "padding": "0", "margine": "0"},
+        )
+    if performance == 0:
+        return dmc.Col(
+            [dmc.Text(f"{close_price} ({performance}%)")],
+            style={"color": "black", "padding": "0", "margine": "0"},
+        )
+    else:
+        return dmc.Col(
+            [dmc.Text(f"{close_price} ({performance}%)")],
+            style={"color": "green", "padding": "0", "margine": "0"},
+        )
+
+
+def make_indice_summary(indicies):
+    summary = []
+    for stock in indicies:
+        values = yahoo_finance.get_performance_today(stock)
+        new_col = dmc.Paper(
+            [
+                dmc.Chip(
+                    f"{values.get('name')}",
+                    value=stock,
+                ),
+                dmc.Text(f"{values.get('symbol')}", size="sm"),
+                dmc.Divider(variant="solid"),
+                dmc.Text(f"{values.get('close')} {values.get('currency')}"),
+                make_performance_color(values.get("change"), values.get("performance")),
+            ],
+            style={"min-width": "30em"},
+            radius="lg",
+            p="xs",
+        )
+        summary.append(new_col)
+
+    return summary
+
+
+def get_stock_list(index):
+    if index == "^DJI":
+        ticker_list = pd.read_html(
+            "https://en.wikipedia.org/wiki/Dow_Jones_Industrial_Average"
+        )
+        df = ticker_list[1][["Symbol", "Company"]]
+        temp_list = [
+            {"value": f"{value}", "label": key}
+            for value, key in zip(df["Symbol"], df["Company"])
+        ]
+
+    elif index == "^GSPC":
+        ticker_list = pd.read_html(
+            "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
+        )
+        df = ticker_list[0][["Symbol", "Security"]]
+        temp_list = [
+            {"value": f"{value}", "label": key}
+            for value, key in zip(df["Symbol"], df["Security"])
+        ]
+
+    elif index == "^NDX":
+        ticker_list = pd.read_html("https://en.wikipedia.org/wiki/Nasdaq-100")
+        df = ticker_list[4][["Ticker", "Company"]]
+        temp_list = [
+            {"value": f"{value}", "label": key}
+            for value, key in zip(df["Ticker"], df["Company"])
+        ]
+
+    elif index == "^GDAXI":
+        ticker_list = pd.read_html("https://en.wikipedia.org/wiki/DAX")
+        df = ticker_list[4][["Ticker", "Company"]]
+        temp_list = [
+            {"value": f"{value}", "label": key}
+            for value, key in zip(df["Ticker"], df["Company"])
+        ]
+
+    return [temp_list, []]
+
+
+def make_plot(df):
+    if len(df) == 0:
+        return px.line(
+            [],
+            x="Date",
+            y=df.columns,
+            hover_data={"Date": "|%B %d, %Y"},
+            title="Your selected stocks",
+        )
+
+    fig = px.line(
+        df,
+        x="Date",
+        y=df.columns,
+        hover_data={"Date": "|%B %d, %Y"},
+        title="Your selected stocks",
+    )
+    fig.update_xaxes(dtick="M1", tickformat="%b\n%Y")
+    return fig

@@ -35,7 +35,6 @@ overview.layout = dmc.Grid(
                             icon="fluent:database-plug-connected-20-filled"
                         ),
                     ),
-                    dmc.Text(id="test"),
                 ],
                 radius="lg",
                 p="xs",

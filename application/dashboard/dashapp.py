@@ -11,6 +11,7 @@ import dash_labs as dl
 from application.auth.decorators import login_required
 from .base import make_base_layout
 from .pages.overview import overview
+from .pages.stocks import stocks
 
 
 def protect_dashviews(dash_app):
@@ -51,9 +52,17 @@ def create_dashapp(server):
     overview.register(
         app,
         "pages.overview",
-        path="/",
+        path=current_app.config["DASH_HOME"],
         title="co2 onboard Dashboard",
         name="co2 onboard Dashboard",
+    )
+
+    stocks.register(
+        app,
+        "pages.stocks",
+        path=current_app.config["DASH_STOCKS"],
+        title="Stocks overview",
+        name="Stocks overview",
     )
 
     return app.server

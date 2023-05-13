@@ -36,6 +36,10 @@ class Config:
     URL_USER_PREFERENCES = "/userpreferences"
     URL_PRIVACY_POLICY = "/privacy_policy"
 
+    # Dash internal routes
+    DASH_HOME = "/"
+    DASH_STOCKS = "/stocks"
+
     # Database
     SQLALCHEMY_DATABASE_URI = environ.get("DATABASE_URI", "sqlite:///database.db")
     SQLALCHEMY_ECHO = False

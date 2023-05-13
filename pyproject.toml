@@ -28,6 +28,12 @@ wtforms = "^3.0.1"
 flask-bootstrap = "^3.3.7.1"
 dash-extensions = "^1.0.0"
 dash-labs = "^1.2.0"
+yahoo-finance = "^1.4.0"
+requests-html = "^0.10.0"
+requests = "^2.30.0"
+yfinance = "^0.2.18"
+html5lib = "^1.1"
+beautifulsoup4 = "^4.12.2"
 
 [tool.poetry.group.dev.dependencies]
 skip = "^0.1.0"
