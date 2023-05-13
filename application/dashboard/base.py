@@ -9,7 +9,15 @@ from .components.modalPassword import modalPasswordChange
 
 def make_base_layout(app):
     base_layout = dmc.MantineProvider(
-        theme={},
+        theme={
+            "components": {
+                "Paper": {
+                    "styles": {
+                        "root": {"box-shadow": "4px 5px 21px -3px rgba(66, 68, 90, 1)"}
+                    }
+                },
+            },
+        },
         inherit=True,
         children=dmc.NotificationsProvider(
             [

@@ -39,7 +39,6 @@ overview.layout = dmc.Grid(
                 ],
                 radius="lg",
                 p="xs",
-                style={"box-shadow": "4px 5px 21px -3px rgba(66, 68, 90, 1)"},
             ),
             span=2,
         ),
@@ -47,7 +46,6 @@ overview.layout = dmc.Grid(
             dmc.Paper(
                 html.Div(id="tabs-content"),
                 radius="lg",
-                style={"box-shadow": "4px 5px 21px -3px rgba(66, 68, 90, 1)"},
                 p="xs",
             ),
             span=10,
@@ -64,33 +62,34 @@ overview.layout = dmc.Grid(
     Input({"type": "table-input", "index": ALL}, "value"),
 )
 def update_graph(current_tab, input_weigts):
-    file_name_excel = get_co2model.get_data_file(current_tab)
-    excel_file = os.path.join(os.getcwd(), "application/data", file_name_excel)
+    """_summary_
+    Callback to update the tabs based on the selection
+    Args:
+        current_tab (string): Value of the current tab from the component
+        input_weigts (List): List of input weights from the table
+
+    Returns:
+        Returns new table based on the input values
+    """
+
+    path_excel = get_co2model.get_data_file(current_tab)
 
     # loading the module at runtime
-    file_name_processing = get_co2model.get_processing_file(current_tab)
-    processing = os.path.join(
-        os.getcwd(), "application/data/processing", file_name_processing
-    )
-    data_processing = load_module(file_name_processing, processing)
+    path_processing_file = get_co2model.get_processing_file(current_tab)
+    data_processing = load_module(path_excel, path_processing_file)
 
-    if ctx.triggered_id is None:
-        excel_file = os.path.join(os.getcwd(), "application/data", file_name_excel)
-        weights = get_user.get_user_preferences(session["user"].get("id"), current_tab)
-        df = data_processing.get_data(excel_file, weights)
+    # Triggered on inital load of the page or tabs changes
+    # Get the user weights for the current tab/model and process the data
+    # Create the table
+    weights = get_user.get_user_preferences(session["user"].get("id"), current_tab)
+    if (ctx.triggered_id is None) or (ctx.triggered_id == "tabs"):
+        df = data_processing.get_data(path_excel, weights)
         return create_table(df, list(weights.values()))
 
-    elif ctx.triggered_id == "tabs":
-        excel_file = os.path.join(os.getcwd(), "application/data", file_name_excel)
-        weights = get_user.get_user_preferences(session["user"].get("id"), current_tab)
-        df = data_processing.get_data(excel_file, weights)
-        return create_table(df, list(weights.values()))
-
+    # Triggered if the user changes the input weights
     elif len(input_weigts) > 0:
-        weights = get_user.get_user_preferences(session["user"].get("id"), current_tab)
         weights_new = dict(zip(list(weights.keys()), input_weigts))
-
-        df = data_processing.get_data(excel_file, weights_new)
+        df = data_processing.get_data(path_excel, weights_new)
         return create_table(df, weights_new)
 
 
@@ -102,12 +101,25 @@ def update_graph(current_tab, input_weigts):
     prevent_initial_call=True,
 )
 def save_settings(n_clicks, weigths, current_tab):
+    """_summary_
+    This callback saves the user input values to the database
+    Args:
+        n_clicks (int): Button trigger
+        weigths (List): List of the input weights
+        current_tab (string): Current selected tab/model
+
+    Returns:
+        string: Returns a notification message
+    """
     if n_clicks:
         current_weigths = get_user.get_user_preferences(
             session["user"].get("id"), current_tab
         )
+
+        # Make values as string for the json
         temp = [str(weight) for weight in weigths]
 
+        # Combine the keys/column names and input values
         new_weigts = dict(zip(list(current_weigths.keys()), temp))
         get_user.save_user_preferences(
             session["user"].get("id"), current_tab, new_weigts

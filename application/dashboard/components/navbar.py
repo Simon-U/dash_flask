@@ -72,11 +72,31 @@ navbar.layout = dmc.Col(
     prevent_initial_call=True,
 )
 def change_password(open, n_clicks, oldPassword, newPassword, confirmNew, opened):
+    """_summary_
+    Callback to trigger modal for changing password
+    Args:
+        open (int): Value of the button to open the change password modal
+        n_clicks (int): Is a value provided by the
+        oldPassword (string): Old password
+        newPassword (string): new password
+        confirmNew (string): confirm new password
+        opened (None, Bool): Value if the modal is open or not
+
+    Returns:
+        Error old password (string): Error message if something is not correct with the old password
+        Error new password (string): Error message if something is not correct with the new password
+        Modal open (bool): Value if the modal should still be open
+        Notification message (string): Message for the notification system
+        oldPassword (string): Value for old password input
+        newPassword (string): Value for new password input
+        confirmNew (string): Value for new confirm password input
+
+    """
+
     if not opened:
         return False, False, not opened, "", oldPassword, newPassword, confirmNew
 
-    pattern = re.compile("^((?=.*\d)(?=.*[A-Z])(?=.*\W).{8,20})$")
-
+    # Check if the old password matches the new password
     if not get_user.check_password(session["user"].get("id"), oldPassword):
         return (
             "The old password is incorrect",
@@ -88,6 +108,9 @@ def change_password(open, n_clicks, oldPassword, newPassword, confirmNew, opened
             confirmNew,
         )
 
+    # Check if the new password has one upper case, lower case letter, one digit and one special character
+    # and is longer than 8
+    pattern = re.compile("^((?=.*\d)(?=.*[A-Z])(?=.*\W).{8,20})$")
     if not pattern.match(newPassword):
         return (
             False,

@@ -14,6 +14,11 @@ from .pages.overview import overview
 
 
 def protect_dashviews(dash_app):
+    """_summary_
+    Function to protect the dash application with flask login
+    Args:
+        dash_app (_type_): input is the app
+    """
     for view_func in dash_app.server.view_functions:
         if view_func.startswith(dash_app.config.url_base_pathname):
             dash_app.server.view_functions[view_func] = login_required(
@@ -34,19 +39,21 @@ def create_dashapp(server):
         plugins=[dl.plugins.pages]
         # assets_folder=assets_path,
     )
+    # Set favicon
     app._favicon = f"{assets_path}/img/favicon.ico"
     app.config["suppress_callback_exceptions"] = True
     app.title = "MES Dashboard"
     protect_dashviews(app)
 
     app.layout = make_base_layout(app)
+
+    # Here the overview page with path is registered
     overview.register(
         app,
         "pages.overview",
         path="/",
-        title="Our Analytics Dashboard",
-        name="Our Analytics Dashboard",
+        title="co2 onboard Dashboard",
+        name="co2 onboard Dashboard",
     )
 
-    # End of create_app method, return the flask app aka server (not the dash app)
     return app.server

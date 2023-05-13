@@ -1,8 +1,9 @@
 """Initialize app."""
+import datetime
+
 from flask import Flask, current_app
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
-from flask_session import Session
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_redmail import RedMail
 from flask_admin import Admin
@@ -13,7 +14,7 @@ from .templates.admin.custom_views import (
     MyAdminIndexView,
 )
 from flask_login import logout_user
-import datetime
+
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -54,6 +55,9 @@ def create_app():
 
     @app.before_first_request
     def create_admin():
+        """_summary_
+        Here we create an admin user and inital preferences. For testing and admin later
+        """
         adminUser = User.query.filter_by(
             email=current_app.config["ADMIN_EMAIL"]
         ).first()

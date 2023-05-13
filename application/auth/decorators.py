@@ -1,7 +1,5 @@
 import flask
-from datetime import datetime, timedelta
 from functools import wraps
-from flask import current_app
 
 
 def login_required(f):
@@ -19,7 +17,6 @@ def login_required(f):
 
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # ToDo make mode for development otherwise just protected
         """
         if not True:
         # Disable authentication, for use in dev/test only!
@@ -33,7 +30,7 @@ def login_required(f):
         return f(*args, **kwargs)
         """
 
-        #! If there is an user, we can get to the dash application
+        # If there is an user, we can get to the dash application
         if not flask.session.get("user"):
             return flask.redirect(flask.url_for("auth_bp.login"))
 

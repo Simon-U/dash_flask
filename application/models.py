@@ -1,9 +1,7 @@
 """Data models."""
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
-
 from . import db
-from sqlalchemy import JSON
 
 
 class User(UserMixin, db.Model):

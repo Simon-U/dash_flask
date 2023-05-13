@@ -1,10 +1,15 @@
-from flask import current_app, session
-from application.models import User, db, co2model
 import json
+import os
+from application.models import User, db, co2model
 
 
 class get_co2model:
     def get_model_names():
+        """_summary_
+        This function provides a list of modles registered in the database
+        Returns:
+            List: List of models in the co2model in the database
+        """
         names = [
             model[0].strip()
             for model in co2model.query.with_entities(co2model.name).all()
@@ -17,24 +22,54 @@ class get_co2model:
         ]
 
     def get_data_file(model):
-        return (
+        """_summary_
+        Function to get the path to the excel data file
+        Args:
+            model (string): model for which the path to the datafile is needed
+
+        Returns:
+            string: returns the string to the data
+        """
+
+        return os.path.join(
+            os.getcwd(),
+            "application/data",
             co2model.query.with_entities(co2model.path_datafile)
             .filter_by(name=model)
             .first()[0]
-            .strip()
+            .strip(),
         )
 
     def get_processing_file(model):
-        return (
+        """_summary_
+        Function to get the path to the python processing file
+        Args:
+            model (string): model for which the path to the datafile is needed
+
+        Returns:
+           string: returns the string to the data
+        """
+        return os.path.join(
+            os.getcwd(),
+            "application/data/processing",
             co2model.query.with_entities(co2model.path_processingfile)
             .filter_by(name=model)
             .first()[0]
-            .strip()
+            .strip(),
         )
 
 
 class get_user:
     def get_user_preferences(user_id, model):
+        """_summary_
+        Function to return a dict with the user preferences for the current model
+        Args:
+            user_id (string): user id
+            model (string): current model
+
+        Returns:
+            dict: User preferences for selected model
+        """
         return {
             key: int(value)
             for key, value in json.loads(
@@ -55,6 +90,17 @@ class get_user:
         return "changed"
 
     def save_user_preferences(user_id, model, weights):
+        """_summary_
+        Function to save new user preferences in the database
+        The function transforms the user weights into a json and saves it in the database
+        Args:
+            user_id (string): user id
+            model (string): current model
+            weights (dict): new weights as a dict
+
+        Returns:
+            dict: User preferences for selected model
+        """
         user = User.query.filter_by(id=user_id).first()
         dict_pref = json.loads(user.preferences)
 

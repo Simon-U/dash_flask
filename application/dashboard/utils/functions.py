@@ -6,6 +6,15 @@ from dash_iconify import DashIconify
 
 
 def load_module(name, path):
+    """_summary_
+    Function to load a python module at runtime given a name and path
+    Args:
+        name (string): name of the module to load
+        path (string): path where the module is stored
+
+    Returns:
+        object: return the loaded module as object
+    """
     spec = importlib.util.spec_from_file_location(name, path)
     data_processing = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(data_processing)
@@ -13,6 +22,14 @@ def load_module(name, path):
 
 
 def make_tabs(tab_names):
+    """_summary_
+    Function to create the tabs
+    Args:
+        tab_names (list): List of tab names
+
+    Returns:
+        returns: html components with tabs
+    """
     list_tabs = [dmc.Tab(name, value=name) for name in tab_names]
     tabs = (
         dmc.TabsList(
@@ -24,10 +41,21 @@ def make_tabs(tab_names):
 
 
 def get_icon(icon, height=16):
+    """_summary_
+    Make a icon with given hieght
+    """
     return DashIconify(icon=icon, height=height)
 
 
 def make_table_icon(value):
+    """_summary_
+    Function to make circle icon based on borders
+    Args:
+        value (int): value to check
+
+    Returns:
+        html: returns the respectif icon
+    """
     size = 30
     if value >= 1:
         return DashIconify(icon="mdi:circle-slice-8", width=size)
@@ -42,6 +70,16 @@ def make_table_icon(value):
 
 
 def create_table(df, weights):
+    """_summary_
+    Creates html table with weights and values
+    Args:
+        df (dataframe): dataframe to be passed into the table
+        weights (dict): dict with row names as keys
+
+    Returns:
+        html: Table
+    """
+    # Adding two columns, Row names and the weights
     df.insert(0, "", list(df.index))
     df.insert(1, "Gewichtung", weights)
     columns, values = df.columns, df.values

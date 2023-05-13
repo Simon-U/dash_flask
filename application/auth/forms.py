@@ -1,6 +1,5 @@
 """Sign-up & log-in forms."""
 from flask_wtf import FlaskForm
-from flask import request
 from wtforms import (
     StringField,
     PasswordField,
@@ -17,16 +16,6 @@ from wtforms.validators import (
     Regexp,
 )
 from wtforms.validators import DataRequired
-
-SUBMIT_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
-
-
-def _is_submitted():
-    """Consider the form submitted if there is an active request and
-    the method is ``POST``, ``PUT``, ``PATCH``, or ``DELETE``.
-    """
-
-    return bool(request) and request.method in SUBMIT_METHODS
 
 
 class SignupForm(FlaskForm):

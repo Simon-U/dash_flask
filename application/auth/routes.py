@@ -21,13 +21,18 @@ from application.models import User, co2model, db
 from .forms import LoginForm, SignupForm, ResetPasswordForm
 from .. import mail
 
-# Blueprint Configuration
+# Register auth_bp as blueprint
 auth_bp = Blueprint(
     "auth_bp", __name__, template_folder="templates", static_folder="application/static"
 )
 
 
 def update_preferences(user):
+    """_summary_
+    This function checks if the user has all the inital preferences or removes unused preferences
+    Args:
+        user (object): User object from database
+    """
     current_preferences = json.loads(
         User.query.with_entities(User.preferences).filter_by(id=user.id).first()[0]
     )
