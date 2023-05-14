@@ -92,7 +92,6 @@ def create_table(df, weights):
     rows = [
         html.Tr(
             [
-                #  ToDo Tooltip needs to be adjusted based onlist/dict
                 html.Td(
                     dmc.Tooltip(
                         label="This is a tooltip",
@@ -224,7 +223,45 @@ def make_plot(df):
         x="Date",
         y=df.columns,
         hover_data={"Date": "|%B %d, %Y"},
-        title="Your selected stocks",
     )
     fig.update_xaxes(dtick="M1", tickformat="%b\n%Y")
+    fig.update_layout(
+        title="Historic Stock Price", xaxis_title="Date", yaxis_title="Price"
+    )
+    fig.update_layout(
+        xaxis=dict(
+            showline=True,
+            showgrid=False,
+            showticklabels=True,
+            linecolor="rgb(204, 204, 204)",
+            linewidth=2,
+            ticks="outside",
+        ),
+        yaxis=dict(
+            showgrid=False,
+            showline=True,
+            showticklabels=True,
+            linecolor="rgb(204, 204, 204)",
+            linewidth=2,
+        ),
+        legend=dict(title="Stock"),
+        plot_bgcolor="white",
+    )
     return fig
+
+
+def create_stocks_table(df):
+    columns, values = df.columns, df.values
+    header = [html.Tr([html.Th(col) for col in columns])]
+    rows = [
+        html.Tr(
+            [
+                html.Td(html.A(cell, href="/dash/new_target", target="_blank"))
+                if ind == 0
+                else html.Td(cell)
+                for ind, cell in enumerate(row)
+            ]
+        )
+        for row in values
+    ]
+    return [html.Thead(header), html.Tbody(rows)]

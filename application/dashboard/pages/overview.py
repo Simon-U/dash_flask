@@ -93,7 +93,7 @@ def update_graph(current_tab, input_weigts):
 
 
 @callback(
-    Output("notifications-container", "children"),
+    Output("notifications-container", "children", allow_duplicate=True),
     Input("save-settings", "n_clicks"),
     State({"type": "table-input", "index": ALL}, "value"),
     State("tabs", "value"),

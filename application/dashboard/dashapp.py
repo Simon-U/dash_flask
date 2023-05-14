@@ -37,18 +37,15 @@ def create_dashapp(server):
         server=server,
         url_base_pathname=current_app.config["URL_DASH"],
         use_pages=True,
-        plugins=[dl.plugins.pages]
+        # plugins=[dl.plugins.pages]
         # assets_folder=assets_path,
     )
     # Set favicon
     app._favicon = f"{assets_path}/img/favicon.ico"
     app.config["suppress_callback_exceptions"] = True
-    app.title = "MES Dashboard"
+    app.title = "Dashboard"
     protect_dashviews(app)
 
-    app.layout = make_base_layout(app)
-
-    # Here the overview page with path is registered
     overview.register(
         app,
         "pages.overview",
@@ -60,9 +57,13 @@ def create_dashapp(server):
     stocks.register(
         app,
         "pages.stocks",
-        path=current_app.config["DASH_STOCKS"],
-        title="Stocks overview",
-        name="Stocks overview",
+        path=current_app.config["DASH_INDEX"],
+        title="Index overview",
+        name="Index overview",
     )
+
+    app.layout = make_base_layout(app)
+
+    # Here the overview page with path is registered
 
     return app.server

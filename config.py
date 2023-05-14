@@ -38,7 +38,7 @@ class Config:
 
     # Dash internal routes
     DASH_HOME = "/"
-    DASH_STOCKS = "/stocks"
+    DASH_INDEX = "/index"
 
     # Database
     SQLALCHEMY_DATABASE_URI = environ.get("DATABASE_URI", "sqlite:///database.db")

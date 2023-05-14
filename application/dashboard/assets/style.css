@@ -13173,9 +13173,6 @@ select.form-control[multiple] {
   background: none;
 }
 
-.mantine-Group-root mantine-1g4q40w {
-  column-gap: 0;
-  row-gap: 0;
-
-  gap: 0;
+.mantine-TransferList-transferListItems {
+  height: 300px !important;
 }

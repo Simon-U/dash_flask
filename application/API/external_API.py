@@ -1,5 +1,5 @@
 import yfinance as yf
-import math
+import pandas as pd
 
 
 class yahoo_finance:
@@ -42,6 +42,44 @@ class yahoo_finance:
 
         return values
 
-    def get_history_data(stock_list):
-        tickers = yf.Tickers(stock_list)
-        return tickers.history(period="1y")["Close"]
+    def get_history_data(stock_string, stock_list):
+        tickers = yf.Tickers(stock_string)
+        values = [
+            "longName",
+            "symbol",
+            "currentPrice",
+            "targetLowPrice",
+            "targetMeanPrice",
+            "targetHighPrice",
+            "currency",
+        ]
+        columns = [
+            "Company name",
+            "Symbol",
+            "Current Price",
+            "Target Low",
+            "Target Mean",
+            "Target High",
+            "Currency",
+        ]
+        data = pd.DataFrame(columns=columns)
+        if len(stock_list) == 1:
+            company_data = [
+                tickers.tickers[stock_list[0].get("value")].info.get(item)
+                for item in values
+            ]
+            data.loc[0] = company_data
+            return (
+                tickers.tickers[stock_list[0].get("value")].history(period="1y")[
+                    "Close"
+                ],
+                data,
+            )
+
+        for stock in stock_list:
+            company_data = [
+                tickers.tickers[stock.get("value")].info.get(item) for item in values
+            ]
+            position = len(data) + 1
+            data.loc[position] = company_data
+        return tickers.history(period="1y")["Close"], data

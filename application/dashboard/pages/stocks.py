@@ -6,21 +6,18 @@ from dateutil.relativedelta import *
 from flask import session
 from dash_extensions.enrich import DashBlueprint, html, Output, Input, State
 from dash import html, callback, ALL, ctx, dcc
+import dash
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
 from dash.exceptions import PreventUpdate
 
-from ...API.internal_API import get_co2model, get_user
 from ..utils.functions import (
-    load_module,
-    make_tabs,
-    create_table,
     make_indice_summary,
     get_stock_list,
     make_plot,
+    create_stocks_table,
 )
 from ...API.external_API import yahoo_finance
-
 
 stocks = DashBlueprint()
 
@@ -54,20 +51,39 @@ stocks.layout = dmc.Grid(
                         data=yahoo_finance.get_indices(index),
                     ),
                     dmc.Space(h=20),
-                    dmc.TransferList(id="transfer-list", value=[[], []]),
+                    dmc.TransferList(
+                        id="transfer-list",
+                        showTransferAll=False,
+                        value=[[], []],
+                    ),
                 ],
                 radius="lg",
                 p="xs",
+                style={"min-height": "470px"},
             ),
             span=2,
+        ),
+        dmc.Col(
+            dmc.Paper(
+                [
+                    dmc.Table(
+                        verticalSpacing="xs", horizontalSpacing="xs", id="company-table"
+                    )
+                ],
+                radius="lg",
+                p="xs",
+                style={"min-height": "470px"},
+            ),
+            span=5,
         ),
         dmc.Col(
             dmc.Paper(
                 [dcc.Graph(id="stocks-graph")],
                 radius="lg",
                 p="xs",
+                style={"min-height": "455px"},
             ),
-            span=10,
+            span=5,
         ),
     ],
     gutter="md",
@@ -105,6 +121,36 @@ def populate_list(selected_index):
 
 @stocks.callback(
     Output("stocks-graph", "figure"),
+    Output("company-table", "children", allow_duplicate=True),
+    Output("notifications-container", "children"),
+    Input("transfer-list", "value"),
+    prevent_initial_call=True,
+)
+def update_graph(stocks_list):
+    stock_list = stocks_list[1]
+
+    if ctx.triggered_id is None:
+        raise PreventUpdate
+
+    elif stock_list == []:
+        return [], [], []
+    else:
+        message = dmc.Notification(
+            id="my-notification",
+            title="Data loaded",
+            message="Thank you for waiting",
+            color="green",
+            action="update",
+            icon=DashIconify(icon="akar-icons:circle-check"),
+        )
+        stock_string = " ".join([dict.get("value") for dict in stock_list])
+        history, company_data = yahoo_finance.get_history_data(stock_string, stock_list)
+        history = history.reset_index()
+        return ((make_plot(history)), create_stocks_table(company_data), message)
+
+
+@stocks.callback(
+    Output("notifications-container", "children", allow_duplicate=True),
     Input("transfer-list", "value"),
     prevent_initial_call=True,
 )
@@ -112,10 +158,17 @@ def update_graph(stocks_list):
     stock_list = stocks_list[1]
     if ctx.triggered_id is None:
         raise PreventUpdate
+
     elif stock_list == []:
-        return []
-    else:
-        stock_list = " ".join([dict.get("value") for dict in stock_list])
-        df = yahoo_finance.get_history_data(stock_list)
-        df = df.reset_index()
-        return make_plot(df)
+        raise PreventUpdate
+
+    return dmc.Notification(
+        id="my-notification",
+        title="Preparing Data",
+        message="The process has started.",
+        loading=True,
+        color="orange",
+        action="show",
+        autoClose=False,
+        disallowClose=True,
+    )

@@ -1,7 +1,7 @@
 from flask import current_app
 
 import dash_mantine_components as dmc
-from dash import html, page_container
+from dash import html, page_container, dcc
 
 from .components.navbar import navbar
 from .components.modalPassword import modalPasswordChange
@@ -48,6 +48,7 @@ def make_base_layout(app):
         inherit=True,
         children=dmc.NotificationsProvider(
             [
+                dcc.Location(id="url", refresh=False),
                 dmc.Grid(
                     children=[
                         modalPasswordChange,

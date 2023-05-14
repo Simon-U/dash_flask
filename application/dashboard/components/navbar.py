@@ -1,4 +1,5 @@
 import re
+import dash
 
 from flask import session, current_app
 from dash_iconify import DashIconify
@@ -9,25 +10,36 @@ from dash import html, page_registry
 
 from ..utils.functions import get_icon
 from ...API.internal_API import get_user
+import dash
 
 
 navbar = DashBlueprint()
 
+links = [["co2 Dashboard", "/dash/"], ["Index Overview", "/dash/index"]]
 
-def nav_tabs():
-    # ToDo needs reqork
-    return [
-        dmc.NavLink(
-            label=page["name"], href=page["path"], className="nav navbar-nav mr-auto"
-        )
-        for page in page_registry.values()
-    ]
+
+def make_nav_links():
+    # print(dash.get_app())
+    return dmc.List(
+        [
+            html.Li(html.A(f"{page[0]}", href=page[1], className="nav-link"))
+            for page in links
+        ],
+        className="nav navbar-nav mr-auto",
+    )
 
 
 navbar.layout = dmc.Col(
     [
         html.Div(
-            dmc.Image(src="/static/img/mes_rgb.png", width=300),
+            [
+                html.Div(
+                    dmc.Image(src="/static/img/mes_rgb.png", width=300),
+                    className="navbar-brand",
+                ),
+                make_nav_links(),
+            ],
+            className="collapse navbar-collapse",
         ),
         dmc.Menu(
             [
