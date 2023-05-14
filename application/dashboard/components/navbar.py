@@ -1,21 +1,25 @@
 import re
-import dash
 
 from flask import session, current_app
 from dash_iconify import DashIconify
 import dash_mantine_components as dmc
 from dash_extensions.enrich import DashBlueprint, Output, Input, State
 from dash_iconify import DashIconify
-from dash import html, page_registry
+from dash import html
 
 from ..utils.functions import get_icon
 from ...API.internal_API import get_user
-import dash
 
 
 navbar = DashBlueprint()
 
-links = [["co2 Dashboard", "/dash/"], ["Index Overview", "/dash/index"]]
+links = [
+    ["co2 Dashboard", current_app.config.get("URL_DASH")],
+    [
+        "Index Overview",
+        f'{current_app.config.get("URL_DASH")[:-1]}{current_app.config.get("DASH_INDEX")}',
+    ],
+]
 
 
 def make_nav_links():

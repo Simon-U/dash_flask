@@ -1,5 +1,3 @@
-from flask import current_app
-
 import dash_mantine_components as dmc
 from dash import html, page_container, dcc
 

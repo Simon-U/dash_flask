@@ -4,9 +4,7 @@
 import os
 
 from flask import current_app
-import pandas as pd
 from dash_extensions.enrich import DashProxy
-import dash_labs as dl
 
 from application.auth.decorators import login_required
 from .base import make_base_layout
@@ -37,7 +35,6 @@ def create_dashapp(server):
         server=server,
         url_base_pathname=current_app.config["URL_DASH"],
         use_pages=True,
-        # plugins=[dl.plugins.pages]
         # assets_folder=assets_path,
     )
     # Set favicon

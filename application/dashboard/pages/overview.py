@@ -1,5 +1,3 @@
-import os
-
 from flask import session
 from dash_extensions.enrich import DashBlueprint, html, Output, Input, State
 from dash import html, callback, ALL, ctx

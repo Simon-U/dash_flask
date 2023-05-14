@@ -458,27 +458,6 @@ files = [
 ]
 
 [[package]]
-name = "dash-labs"
-version = "1.2.0"
-description = "Experimental enhancements for potential inclusion in Dash"
-category = "main"
-optional = false
-python-versions = ">=3.6.*"
-files = [
-    {file = "dash-labs-1.2.0.tar.gz", hash = "sha256:bc7a7bdb3e57cdf4f15baa759a35794e6a664c99b2dbd12730bfe6b5606a4bcc"},
-    {file = "dash_labs-1.2.0-py3-none-any.whl", hash = "sha256:776613eca6eb2efd4cbaa1e7b2a6e453af8539243b2805ca73c4a5a09627567e"},
-]
-
-[package.dependencies]
-appdirs = ">=1.4.4"
-itsdangerous = ">=2.0.1"
-
-[package.extras]
-diskcache = ["diskcache (>=5.2.1)"]
-postgres = ["psycopg2-binary (>=2.9.3)"]
-redis = ["redis (>=3.5.3)"]
-
-[[package]]
 name = "dash-mantine-components"
 version = "0.12.1"
 description = "Plotly Dash Components based on Mantine"
@@ -2191,4 +2170,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "3.8.16"
-content-hash = "741b65d57e4b989e2a6e5d02fe4f38742c57366894c4b026468470aa4cf59bd5"
+content-hash = "f6256cd29b169bfb7c739237120b734e18e6eda3d37ee84b424d8834ee1c4c01"
