@@ -70,14 +70,18 @@ class get_user:
         Returns:
             dict: User preferences for selected model
         """
-        return {
-            key: int(value)
-            for key, value in json.loads(
-                User.query.filter_by(id=user_id).first().preferences
+
+        try:
+            preferences = (
+                json.loads(User.query.filter_by(id=user_id).first().preferences)
+                .get(model)
+                .items()
             )
-            .get(model)
-            .items()
-        }
+        except:
+            preferences = (
+                User.query.filter_by(id=user_id).first().preferences.get(model).items()
+            )
+        return {key: int(value) for key, value in preferences}
 
     def check_password(user_id, password):
         user = User.query.filter_by(id=user_id).first()
@@ -102,7 +106,10 @@ class get_user:
             dict: User preferences for selected model
         """
         user = User.query.filter_by(id=user_id).first()
-        dict_pref = json.loads(user.preferences)
+        try:
+            dict_pref = json.loads(user.preferences)
+        except:
+            dict_pref = user.preferences
 
         dict_pref[model] = weights
         user.preferences = json.dumps(dict_pref)

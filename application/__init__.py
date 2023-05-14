@@ -1,6 +1,7 @@
 """Initialize app."""
 import datetime
-
+import json
+import os
 from flask import Flask, current_app
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
@@ -53,39 +54,6 @@ def create_app():
     # Initialize Plugins and register them with the app
     db.init_app(app)
 
-    @app.before_first_request
-    def create_admin():
-        """_summary_
-        Here we create an admin user and inital preferences. For testing and admin later
-        """
-        adminUser = User.query.filter_by(
-            email=current_app.config["ADMIN_EMAIL"]
-        ).first()
-        if not adminUser:
-            user = User(
-                first_name=current_app.config["ADMIN_FIRST_NAME"],
-                last_name=current_app.config["ADMIN_LAST_NAME"],
-                email=current_app.config["ADMIN_EMAIL"],
-                is_admin=True,
-                verified=True,
-                created=datetime.datetime.now(),
-                data_consent=True,
-            )
-            user.set_password(current_app.config["ADMIN_PASSWORD"])
-            db.session.add(user)
-
-            co2mod = co2model(
-                name="EU Norm 1",
-                inital_preferences=test_preferences,
-                path_datafile="02_Technologien.xlsx",
-                path_processingfile="main.py",
-            )
-            db.session.add(co2mod)
-            db.session.commit()
-
-            # User is auto loged in, but we want hom to verify
-            logout_user()
-
     login_manager.init_app(app)
     mail.init_app(app)
     admin_manager.init_app(app)
@@ -111,6 +79,34 @@ def create_app():
 
         # Create Database Models
         db.create_all()
+
+        if co2model.query.filter_by(name="EU Norm 1").first() is None:
+            co2mod = co2model(
+                name="EU Norm 1",
+                inital_preferences=json.dumps(test_preferences),
+                path_datafile="02_Technologien.xlsx",
+                path_processingfile="main.py",
+            )
+            db.session.add(co2mod)
+            db.session.commit()
+
+        if (
+            User.query.filter_by(email=current_app.config["ADMIN_EMAIL"]).first()
+            is None
+        ):
+            user = User(
+                first_name=current_app.config["ADMIN_FIRST_NAME"],
+                last_name=current_app.config["ADMIN_LAST_NAME"],
+                email=current_app.config["ADMIN_EMAIL"],
+                preferences=json.dumps(test_preferences),
+                is_admin=True,
+                verified=True,
+                created=datetime.datetime.now(),
+                data_consent=True,
+            )
+            user.set_password(current_app.config["ADMIN_PASSWORD"])
+            db.session.add(user)
+            db.session.commit()
 
         # Integrate the dasg application
         from .dashboard.dashapp import create_dashapp
