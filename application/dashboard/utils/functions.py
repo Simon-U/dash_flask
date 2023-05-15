@@ -72,51 +72,51 @@ def make_table_icon(value):
     elif 0.6 > value >= 0.4:
         return DashIconify(icon="mdi:circle-slice-4", width=size)
     elif 0.4 > value >= 0.2:
-        #print(f'value type" {type(value)} and value {value} in column {id}, row id {row_id}')
+        # print(f'value type" {type(value)} and value {value} in column {id}, row id {row_id}')
         return DashIconify(icon="mdi:circle-slice-2", width=size)
     elif value < 0.2:
         return DashIconify(icon="mdi:circle-outline", width=size)
-    
-    
+
+
 def make_first_row(id, value):
     if id == 0:
         return html.Td(
-                    dmc.Tooltip(
-                        label="This is a tooltip",
-                        position="left",
-                        offset=3,
-                        children=value,
-                    )
-                )
+            dmc.Tooltip(
+                label="This is a tooltip",
+                position="left",
+                offset=3,
+                children=value,
+            )
+        )
     elif id == 1:
         return html.Td()
     else:
-        return html.Td(round(value,2))
-    
+        return html.Td(round(value, 2))
+
+
 def make_other_rows(id, value):
     if id == 0:
         return html.Td(
-                    dmc.Tooltip(
-                        label="This is a tooltip",
-                        position="left",
-                        offset=3,
-                        children=value,
-                    )
-                )
+            dmc.Tooltip(
+                label="This is a tooltip",
+                position="left",
+                offset=3,
+                children=value,
+            )
+        )
     elif id == 1:
         return html.Td(
-                    dmc.NumberInput(
-                        value=value,
-                        min=0,
-                        max=10,
-                        step=1,
-                        style={"width": 70},
-                        id={"type": "table-input", "index": id},
-                    )
-                )
+            dmc.NumberInput(
+                value=value,
+                min=0,
+                max=10,
+                step=1,
+                style={"width": 70},
+                id={"type": "table-input", "index": id},
+            )
+        )
     else:
         return html.Td(make_table_icon(value))
-        
 
 
 def create_table(df, weights, total_score):
@@ -133,26 +133,17 @@ def create_table(df, weights, total_score):
     new_row = dict(zip(df.columns, list(total_score)))
     df = pd.concat([pd.DataFrame([new_row]), df])
     df.reset_index(inplace=True)
-    df.at[0, 'index'] = 'Total Score'
+    df.at[0, "index"] = "Total Score"
     new_weights = [-1] + weights
     df.insert(1, "Weights", new_weights)
-    df.rename(columns={'index': ''}, inplace=True)
+    df.rename(columns={"index": ""}, inplace=True)
 
-    
     columns, values = df.columns, df.values
     header = [html.Tr([html.Th(col) for col in columns])]
     rows = [
-        html.Tr([
-            make_first_row(ind, cell)
-            for ind, cell in enumerate(row)
-        ]
-        )
+        html.Tr([make_first_row(ind, cell) for ind, cell in enumerate(row)])
         if id == 0
-        else html.Tr([
-            make_other_rows(ind, cell)
-            for ind, cell in enumerate(row)
-        ]
-        )
+        else html.Tr([make_other_rows(ind, cell) for ind, cell in enumerate(row)])
         for id, row in enumerate(values)
     ]
     table = dmc.Table(
@@ -181,6 +172,32 @@ def make_performance_color(close_price, performance):
         )
 
 
+def get_style(traded):
+    if traded:
+        return {"color": "#50C878"}
+    else:
+        return {"color": "#000"}
+
+
+def get_text(values):
+    if values.get("traded"):
+        input = (
+            [
+                DashIconify(icon="icon-park-outline:stock-market", width=25),
+                f"{values.get('symbol')}",
+            ],
+        )
+
+        return input[0]
+    else:
+        input = (
+            [
+                f"{values.get('symbol')}",
+            ],
+        )
+        return input[0]
+
+
 def make_indice_summary(indicies):
     summary = []
     for stock in indicies:
@@ -190,8 +207,15 @@ def make_indice_summary(indicies):
                 dmc.Chip(
                     f"{values.get('name')}",
                     value=stock,
+                    style={"color": "green"}
+                    if values.get("traded")
+                    else {"color": "#000"},
                 ),
-                dmc.Text(f"{values.get('symbol')}", size="sm"),
+                dmc.Text(
+                    get_text(values),
+                    size="sm",
+                    style=get_style(values.get("traded")),
+                ),
                 dmc.Divider(variant="solid"),
                 dmc.Text(f"{values.get('close')} {values.get('currency')}"),
                 make_performance_color(values.get("change"), values.get("performance")),
@@ -293,7 +317,13 @@ def create_stocks_table(df):
     rows = [
         html.Tr(
             [
-                html.Td(html.A(cell, href=f'{current_app.config.get("URL_DASH")[:-1]}{current_app.config.get("DASH_STOCK_DETAIL")}?stock={df.loc[row_id+1, "Symbol"]}', target="_blank"))
+                html.Td(
+                    html.A(
+                        cell,
+                        href=f'{current_app.config.get("URL_DASH")[:-1]}{current_app.config.get("DASH_STOCK_DETAIL")}?stock={df.loc[row_id+1, "Symbol"]}',
+                        target="_blank",
+                    )
+                )
                 if ind == 0
                 else html.Td(cell)
                 for ind, cell in enumerate(row)
@@ -302,3 +332,30 @@ def create_stocks_table(df):
         for row_id, row in enumerate(values)
     ]
     return [html.Thead(header), html.Tbody(rows)]
+
+
+def make_profile_table(desired_values, df):
+    rows = [
+        html.Tr([html.Td(desired_values.get(key)), html.Td(df.get(key))])
+        for key in list(desired_values.keys())
+    ]
+
+    return [html.Tbody(rows)]
+
+
+def make_company_information(desired_values, df):
+    rows = [
+        html.Tr([html.Td(desired_values.get(key)), html.Td(df.get(key))])
+        for key in list(desired_values.keys())
+    ]
+    company_info = [
+        dmc.Title(f"{df.get('longName')}", order=1),
+        dmc.Table(
+            verticalSpacing="xs",
+            horizontalSpacing="xs",
+            children=[html.Tbody(rows)],
+            style={"padding-top": "35px"},
+        ),
+    ]
+
+    return company_info

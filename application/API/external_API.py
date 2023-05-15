@@ -1,5 +1,6 @@
 import yfinance as yf
 import pandas as pd
+import datetime
 
 
 class yahoo_finance:
@@ -12,17 +13,18 @@ class yahoo_finance:
 
     def get_performance_today(symbol):
         stock = yf.Ticker(symbol)
-        close = stock.info.get("currentPrice")
+        close = stock.info.get("bid")
         stock_info = stock.info
-        if close is None:
-            stock_hist = stock.history(period="1d")
-            close = stock_hist["Close"].item()
-            open = stock_hist["Open"].item()
-            volume = stock_hist["Volume"].item()
+        # print(stock.info)
+        stock_hist = stock.history(period="1d")
+        if stock_hist.index[0].date() == datetime.datetime.today().date():
+            traded = True
         else:
-            close = stock_info.get("currentPrice")
-            open = stock_info.get("open")
-            volume = stock_info.get("volume")
+            traded = False
+        close = stock_hist["Close"].item()
+        open = stock_hist["Open"].item()
+        volume = stock_hist["Volume"].item()
+
         performance = round(
             (close - open) / open * 100,
             3,
@@ -38,8 +40,9 @@ class yahoo_finance:
             "name": stock_info.get("longName"),
             "currency": stock_info.get("currency"),
             "symbol": stock_info.get("symbol"),
+            "traded": traded,
         }
-
+        # print(values)
         return values
 
     def get_history_data(stock_string, stock_list):
@@ -83,3 +86,10 @@ class yahoo_finance:
             position = len(data) + 1
             data.loc[position] = company_data
         return tickers.history(period="1y")["Close"], data
+
+    def get_company_data(value_inputs, stock_symbol):
+        stock = yf.Ticker(stock_symbol)
+        stock_info = stock.info
+        data = {value: stock_info.get(value) for value in value_inputs}
+
+        return data
