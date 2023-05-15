@@ -62,19 +62,63 @@ def make_table_icon(value):
         html: returns the respectif icon
     """
     size = 30
-    if value >= 1:
+    value = round(value, 3)
+
+    if value >= 0.8:
         return DashIconify(icon="mdi:circle-slice-8", width=size)
-    elif 1 > value >= 0.6:
+    elif 0.8 > value >= 0.6:
         return DashIconify(icon="mdi:circle-slice-6", width=size)
-    elif 0.6 > value >= 0.5:
-        return DashIconify(icon="circle-slice-4", width=size)
-    elif 0.5 > value > 0:
+    elif 0.6 > value >= 0.4:
+        return DashIconify(icon="mdi:circle-slice-4", width=size)
+    elif 0.4 > value >= 0.2:
+        #print(f'value type" {type(value)} and value {value} in column {id}, row id {row_id}')
         return DashIconify(icon="mdi:circle-slice-2", width=size)
-    elif value == 0:
+    elif value < 0.2:
         return DashIconify(icon="mdi:circle-outline", width=size)
+    
+    
+def make_first_row(id, value):
+    if id == 0:
+        return html.Td(
+                    dmc.Tooltip(
+                        label="This is a tooltip",
+                        position="left",
+                        offset=3,
+                        children=value,
+                    )
+                )
+    elif id == 1:
+        return html.Td()
+    else:
+        return html.Td(round(value,2))
+    
+def make_other_rows(id, value):
+    if id == 0:
+        return html.Td(
+                    dmc.Tooltip(
+                        label="This is a tooltip",
+                        position="left",
+                        offset=3,
+                        children=value,
+                    )
+                )
+    elif id == 1:
+        return html.Td(
+                    dmc.NumberInput(
+                        value=value,
+                        min=0,
+                        max=10,
+                        step=1,
+                        style={"width": 70},
+                        id={"type": "table-input", "index": id},
+                    )
+                )
+    else:
+        return html.Td(make_table_icon(value))
+        
 
 
-def create_table(df, weights):
+def create_table(df, weights, total_score):
     """_summary_
     Creates html table with weights and values
     Args:
@@ -85,38 +129,30 @@ def create_table(df, weights):
         html: Table
     """
     # Adding two columns, Row names and the weights
-    df.insert(0, "", list(df.index))
-    df.insert(1, "Gewichtung", weights)
+    new_row = dict(zip(df.columns, list(total_score)))
+    df = pd.concat([pd.DataFrame([new_row]), df])
+    df.reset_index(inplace=True)
+    df.at[0, 'index'] = 'Total Score'
+    new_weights = [-1] + weights
+    df.insert(1, "Weights", new_weights)
+    df.rename(columns={'index': ''}, inplace=True)
+
+    
     columns, values = df.columns, df.values
     header = [html.Tr([html.Th(col) for col in columns])]
     rows = [
-        html.Tr(
-            [
-                html.Td(
-                    dmc.Tooltip(
-                        label="This is a tooltip",
-                        position="left",
-                        offset=3,
-                        children=cell,
-                    )
-                )
-                if ind == 0
-                else html.Td(
-                    dmc.NumberInput(
-                        value=cell,
-                        min=0,
-                        max=10,
-                        step=1,
-                        style={"width": 70},
-                        id={"type": "table-input", "index": ind},
-                    )
-                )
-                if ind == 1
-                else html.Td(make_table_icon(cell))
-                for ind, cell in enumerate(row)
-            ]
+        html.Tr([
+            make_first_row(ind, cell)
+            for ind, cell in enumerate(row)
+        ]
         )
-        for row in values
+        if id == 0
+        else html.Tr([
+            make_other_rows(ind, cell)
+            for ind, cell in enumerate(row)
+        ]
+        )
+        for id, row in enumerate(values)
     ]
     table = dmc.Table(
         verticalSpacing="xs",

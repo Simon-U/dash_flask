@@ -80,14 +80,16 @@ def update_graph(current_tab, input_weigts):
     # Create the table
     weights = get_user.get_user_preferences(session["user"].get("id"), current_tab)
     if (ctx.triggered_id is None) or (ctx.triggered_id == "tabs"):
-        df = data_processing.get_data(path_excel, weights)
-        return create_table(df, list(weights.values()))
+        data, total_score = data_processing.get_data(path_excel, weights)
+
+        return create_table(data, list(weights.values()), total_score)
 
     # Triggered if the user changes the input weights
     elif len(input_weigts) > 0:
         weights_new = dict(zip(list(weights.keys()), input_weigts))
-        df = data_processing.get_data(path_excel, weights_new)
-        return create_table(df, weights_new)
+        data, total_score = data_processing.get_data(path_excel, weights_new)
+
+        return create_table(data, input_weigts, total_score)
 
 
 @callback(

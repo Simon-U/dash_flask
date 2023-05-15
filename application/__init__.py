@@ -84,8 +84,8 @@ def create_app():
             co2mod = co2model(
                 name="EU Norm 1",
                 inital_preferences=json.dumps(test_preferences),
-                path_datafile="02_Technologien.xlsx",
-                path_processingfile="main.py",
+                path_datafile="01_aussichtsreichsteTechnologien.xlsx",
+                path_processingfile="dataProcessing.py",
             )
             db.session.add(co2mod)
             db.session.commit()

@@ -12,6 +12,7 @@ def get_data(file_path, weights):
     data = data.drop("Vorgabe")
 
     result_df = pd.Series(weights, name="weights")
+    result_df.index = bounds.index.copy()
     scores = {}
 
     technologies = data.index
@@ -46,13 +47,20 @@ def get_data(file_path, weights):
                                 }
                             )
                     elif criterion == "verwendeter Kraftstoff":
-                        scores[technology].update(
-                            {
-                                criterion: int(
-                                    series[series == value].tail(1).index[0][-1]
-                                )
-                            }
-                        )
+                        if value in ['Methanol', 'LNG', 'MGO', 'HFO']:
+                            scores[technology].update(
+                                {
+                                    criterion: int(
+                                        series[series == value].tail(1).index[0][-1]
+                                    )
+                                }
+                            )
+                        else:
+                            scores[technology].update(
+                                {
+                                    criterion: 0
+                                }
+                            )
                 elif rule == "<=":
                     scores[technology].update(
                         {criterion: int(series[series > value].tail(1).index[0][-1])}
@@ -68,17 +76,19 @@ def get_data(file_path, weights):
     result_df = pd.merge(
         left=result_df, right=scores_df, left_index=True, right_index=True
     )
-
+    # Fill not available technology scores with 0
+    result_df = result_df.fillna(0)
     for technology in technologies:
-        # get weights only for those technologies where data exists
-        nan_scores = result_df.index[np.isnan(result_df[technology])]
-        weights_sum = result_df["weights"].drop(nan_scores).sum()
-        result_df[technology] = (
-            result_df["weights"] * result_df[technology] / weights_sum
-        )
+        weights_sum = result_df["weights"].sum()
+        result_df[technology] = (result_df["weights"] * result_df[technology] / weights_sum)
 
     result_df = result_df.drop("weights", axis=1)
-    result_df.sum()
-    pass
 
-    return result_df
+    technologies_score = result_df.sum()
+    technologies_score = technologies_score.sort_values(ascending=False)
+
+    result_sorted = pd.DataFrame(index=result_df.index)
+    for tx in technologies_score.index:
+        result_sorted[tx] = result_df[tx]
+
+    return result_sorted, technologies_score
