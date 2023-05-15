@@ -3,6 +3,13 @@ import pandas as pd
 import datetime
 
 
+def normalize_officer(data):
+    return [
+        [officer.get("name"), officer.get("title")]
+        for officer in data.get("companyOfficers")
+    ]
+
+
 class yahoo_finance:
     def get_indices(list):
         data = []
@@ -16,7 +23,9 @@ class yahoo_finance:
         close = stock.info.get("bid")
         stock_info = stock.info
         # print(stock.info)
-        stock_hist = stock.history(period="1d")
+        stock_hist = stock.history(
+            period="1d",
+        )
         if stock_hist.index[0].date() == datetime.datetime.today().date():
             traded = True
         else:
@@ -47,6 +56,7 @@ class yahoo_finance:
 
     def get_history_data(stock_string, stock_list):
         tickers = yf.Tickers(stock_string)
+
         values = [
             "longName",
             "symbol",
@@ -90,6 +100,20 @@ class yahoo_finance:
     def get_company_data(value_inputs, stock_symbol):
         stock = yf.Ticker(stock_symbol)
         stock_info = stock.info
-        data = {value: stock_info.get(value) for value in value_inputs}
+
+        data = {
+            value: (
+                normalize_officer(stock_info)
+                if value == "companyOfficers"
+                else stock_info.get(value)
+            )
+            for value in value_inputs
+        }
 
         return data
+
+    def get_current_company_price(symbol):
+        stock = yf.Ticker(symbol)
+
+        stock_history = stock.history(period="1d", interval="1m")
+        return stock_history

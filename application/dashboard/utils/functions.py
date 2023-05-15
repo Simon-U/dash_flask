@@ -2,6 +2,7 @@ import importlib
 
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 import pandas as pd
 from flask import current_app
 
@@ -343,6 +344,27 @@ def make_profile_table(desired_values, df):
     return [html.Tbody(rows)]
 
 
+def make_table(desired_values, df):
+    rows = [
+        html.Tr(
+            [
+                html.Td(desired_values.get(key)),
+                (html.Td(df.get(key)) if df.get(key) > 0 else html.Td()),
+            ]
+        )
+        for key in list(desired_values.keys())
+    ]
+    company_info = [
+        dmc.Table(
+            verticalSpacing="xs",
+            horizontalSpacing="xs",
+            children=[html.Tbody(rows)],
+        ),
+    ]
+
+    return company_info
+
+
 def make_company_information(desired_values, df):
     rows = [
         html.Tr([html.Td(desired_values.get(key)), html.Td(df.get(key))])
@@ -354,8 +376,50 @@ def make_company_information(desired_values, df):
             verticalSpacing="xs",
             horizontalSpacing="xs",
             children=[html.Tbody(rows)],
-            style={"padding-top": "35px"},
         ),
     ]
 
     return company_info
+
+
+def make_stock_plot(df):
+    if len(df) == 0:
+        return px.line(
+            [],
+            x="Date",
+            y=df.columns,
+            hover_data={"Date": "|%B %d, %Y"},
+            title="Your selected stocks",
+        )
+
+    fig = go.Figure(
+        data=go.Ohlc(
+            x=df["Datetime"],
+            open=df["Open"],
+            high=df["High"],
+            low=df["Low"],
+            close=df["Close"],
+        )
+    )
+    fig.update_layout(
+        title="Live Ticker",
+        yaxis_title="Stock Price",
+        xaxis=dict(
+            showline=True,
+            showgrid=False,
+            showticklabels=True,
+            linecolor="rgb(204, 204, 204)",
+            linewidth=2,
+            ticks="outside",
+        ),
+        yaxis=dict(
+            showgrid=False,
+            showline=True,
+            showticklabels=True,
+            linecolor="rgb(204, 204, 204)",
+            linewidth=2,
+        ),
+        legend=dict(title="Stock"),
+        plot_bgcolor="white",
+    )
+    return fig
