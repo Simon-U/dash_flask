@@ -1,6 +1,7 @@
+import datetime
+
 import yfinance as yf
 import pandas as pd
-import datetime
 
 
 def normalize_officer(data):
@@ -12,6 +13,14 @@ def normalize_officer(data):
 
 class yahoo_finance:
     def get_indices(list):
+        """_summary_
+        List of indec
+        Args:
+            list (list): Symbols for the indecies
+
+        Returns:
+            dict: Returns dicktionary with the Symbol and name
+        """
         data = []
         for symbol in list:
             stock = yf.Ticker(symbol)
@@ -19,6 +28,14 @@ class yahoo_finance:
         return data
 
     def get_performance_today(symbol):
+        """_summary_
+        Calculates the stocks performance based on the symbol
+        Args:
+            symbol (string): Symbol for the stock/index
+
+        Returns:
+            dict: Returns dict with different values
+        """
         stock = yf.Ticker(symbol)
         close = stock.info.get("bid")
         stock_info = stock.info
@@ -54,7 +71,16 @@ class yahoo_finance:
         # print(values)
         return values
 
-    def get_history_data(stock_string, stock_list):
+    def get_history_data(stock_list):
+        """_summary_
+        Method to retrieve the data for the historic data plot in the index page
+        Args:
+            stock_list (list): List of the stocks mentioned in the string
+
+        Returns:
+            dataframe: _description_
+        """
+        stock_string = " ".join([dict.get("value") for dict in stock_list])
         tickers = yf.Tickers(stock_string)
 
         values = [
@@ -76,6 +102,7 @@ class yahoo_finance:
             "Currency",
         ]
         data = pd.DataFrame(columns=columns)
+        print(stock_list)
         if len(stock_list) == 1:
             company_data = [
                 tickers.tickers[stock_list[0].get("value")].info.get(item)
@@ -98,6 +125,15 @@ class yahoo_finance:
         return tickers.history(period="1y")["Close"], data
 
     def get_company_data(value_inputs, stock_symbol):
+        """_summary_
+        MEthod to retrive different values fabout a certain company
+        Args:
+            value_inputs (dict): values you with to retrive
+            stock_symbol (string): Company symbol
+
+        Returns:
+            returns: Dictinary with the selected values
+        """
         stock = yf.Ticker(stock_symbol)
         stock_info = stock.info
 
@@ -113,6 +149,14 @@ class yahoo_finance:
         return data
 
     def get_current_company_price(symbol):
+        """_summary_
+        Method to return the current stock data within a 1 day moving frame and a 1m intervall
+        Args:
+            symbol (string): Company symbol
+
+        Returns:
+            dataframe: the timeseries
+        """
         stock = yf.Ticker(symbol)
 
         stock_history = stock.history(period="1d", interval="1m")

@@ -3,7 +3,6 @@ import importlib
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import pandas as pd
 from flask import current_app
 
 import dash_mantine_components as dmc
@@ -73,7 +72,6 @@ def make_table_icon(value):
     elif 0.6 > value >= 0.4:
         return DashIconify(icon="mdi:circle-slice-4", width=size)
     elif 0.4 > value >= 0.2:
-        # print(f'value type" {type(value)} and value {value} in column {id}, row id {row_id}')
         return DashIconify(icon="mdi:circle-slice-2", width=size)
     elif value < 0.2:
         return DashIconify(icon="mdi:circle-outline", width=size)
@@ -231,6 +229,7 @@ def make_indice_summary(indicies):
 
 
 def get_stock_list(index):
+    # ToDo They are scraping, but could be counted as API call, maybe move to different py
     if index == "^DJI":
         ticker_list = pd.read_html(
             "https://en.wikipedia.org/wiki/Dow_Jones_Industrial_Average"
@@ -271,6 +270,14 @@ def get_stock_list(index):
 
 
 def make_plot(df):
+    """_summary_
+    Make the multiline plot for the index overview page.
+    Args:
+        df (dataframe): Data input
+
+    Returns:
+        fig: Returns a figure object
+    """
     if len(df) == 0:
         return px.line(
             [],
@@ -313,15 +320,26 @@ def make_plot(df):
 
 
 def create_stocks_table(df):
+    """_summary_
+
+    Args:
+        df (dataframe): The data to plot (company informations)
+
+    Returns:
+        layour: Returns table with values
+    """
     columns, values = df.columns, df.values
     header = [html.Tr([html.Th(col) for col in columns])]
+    if len(df) > 1:
+        df.index -= 1
+
     rows = [
         html.Tr(
             [
                 html.Td(
                     html.A(
                         cell,
-                        href=f'{current_app.config.get("URL_DASH")[:-1]}{current_app.config.get("DASH_STOCK_DETAIL")}?stock={df.loc[row_id+1, "Symbol"]}',
+                        href=f'{current_app.config.get("URL_DASH")[:-1]}{current_app.config.get("DASH_STOCK_DETAIL")}?stock={df.loc[row_id, "Symbol"]}',
                         target="_blank",
                     )
                 )
@@ -335,21 +353,39 @@ def create_stocks_table(df):
     return [html.Thead(header), html.Tbody(rows)]
 
 
-def make_profile_table(desired_values, df):
+def make_text_table(desired_values, data_dict):
+    """_summary_
+    Make the table with text for the company. Different from
+    Args:
+        desired_values (dict): dict with values and lables for the table
+        data_dict (dict): with the data
+
+    Returns:
+        layout: Table
+    """
     rows = [
-        html.Tr([html.Td(desired_values.get(key)), html.Td(df.get(key))])
+        html.Tr([html.Td(desired_values.get(key)), html.Td(data_dict.get(key))])
         for key in list(desired_values.keys())
     ]
 
     return [html.Tbody(rows)]
 
 
-def make_table(desired_values, df):
+def make_numbers_table(desired_values, data_dict):
+    """_summary_
+    Function to make a general table with data. We skip 0 here
+    Args:
+        desired_values (dict): dict with values and lables for the table
+        data_dict (dict): with the data
+
+    Returns:
+        layout: Table
+    """
     rows = [
         html.Tr(
             [
                 html.Td(desired_values.get(key)),
-                (html.Td(df.get(key)) if df.get(key) > 0 else html.Td()),
+                (html.Td(data_dict.get(key)) if data_dict.get(key) > 0 else html.Td()),
             ]
         )
         for key in list(desired_values.keys())
@@ -365,24 +401,15 @@ def make_table(desired_values, df):
     return company_info
 
 
-def make_company_information(desired_values, df):
-    rows = [
-        html.Tr([html.Td(desired_values.get(key)), html.Td(df.get(key))])
-        for key in list(desired_values.keys())
-    ]
-    company_info = [
-        dmc.Title(f"{df.get('longName')}", order=1),
-        dmc.Table(
-            verticalSpacing="xs",
-            horizontalSpacing="xs",
-            children=[html.Tbody(rows)],
-        ),
-    ]
-
-    return company_info
-
-
 def make_stock_plot(df):
+    """_summary_
+    Make the stocks plot
+    Args:
+        df (dataframe): History data for a single stock
+
+    Returns:
+        figure: The reeady to plot figure
+    """
     if len(df) == 0:
         return px.line(
             [],

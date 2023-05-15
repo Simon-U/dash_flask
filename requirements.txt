@@ -68,6 +68,7 @@ pytz==2023.3
 redmail==0.6.0
 requests==2.30.0
 requests-html==0.10.0
+scipy==1.10.1
 simplejson==3.19.1
 six==1.16.0
 skip==0.1.0

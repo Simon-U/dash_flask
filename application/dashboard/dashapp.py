@@ -1,6 +1,3 @@
-"""
-#ToDo here we will write the dash app
-"""
 import os
 
 from flask import current_app
@@ -59,7 +56,7 @@ def create_dashapp(server):
         title="Index overview",
         name="Index overview",
     )
-    
+
     stock_detail_bp.register(
         app,
         "pages.stock_detail",

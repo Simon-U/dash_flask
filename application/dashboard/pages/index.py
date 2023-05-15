@@ -136,8 +136,8 @@ def update_graph(stocks_list):
             action="update",
             icon=DashIconify(icon="akar-icons:circle-check"),
         )
-        stock_string = " ".join([dict.get("value") for dict in stock_list])
-        history, company_data = yahoo_finance.get_history_data(stock_string, stock_list)
+
+        history, company_data = yahoo_finance.get_history_data(stock_list)
         history = history.reset_index()
         return ((make_plot(history)), create_stocks_table(company_data), message)
 

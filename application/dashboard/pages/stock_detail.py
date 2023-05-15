@@ -1,22 +1,16 @@
 from dash_extensions.enrich import DashBlueprint, Output, Input
 from dash import ctx, dcc
 import dash_mantine_components as dmc
-from dash_iconify import DashIconify
-from dash.exceptions import PreventUpdate
 
 from ..utils.functions import (
-    make_indice_summary,
-    get_stock_list,
     make_stock_plot,
-    make_table,
-    make_profile_table,
-    make_company_information,
+    make_text_table,
+    make_numbers_table,
 )
 from ...API.external_API import yahoo_finance
 
 stock_detail_bp = DashBlueprint()
 
-index_values = ["^DJI", "^GSPC", "^NDX", "^GDAXI"]
 
 stock_detail_bp.layout = dmc.Grid(
     [
@@ -27,7 +21,12 @@ stock_detail_bp.layout = dmc.Grid(
                     [
                         dmc.Paper(
                             [
-                                dmc.Text(id="company-name"),
+                                dmc.Title(order=1, id="company-name"),
+                                dmc.Table(
+                                    verticalSpacing="xs",
+                                    horizontalSpacing="xs",
+                                    id="company-information-table",
+                                ),
                             ],
                             radius="lg",
                             p="xs",
@@ -136,8 +135,9 @@ stock_detail_bp.layout = dmc.Grid(
 
 @stock_detail_bp.callback(
     Output("company-name", "children"),
-    Output("company-description", "children"),
+    Output("company-information-table", "children"),
     Output("company-profile-table", "children"),
+    Output("company-description", "children"),
     Output("company-fundemantals", "children"),
     Output("company-stock", "children"),
     Input("url", "search"),
@@ -212,16 +212,15 @@ def update(stock_symbol):
     company_data = yahoo_finance.get_company_data(
         list(value_inputs.keys()), stock_symbol.split("=")[1]
     )
-    layout_company_information = make_company_information(
-        company_information, company_data
-    )
-    table_company_profile = make_profile_table(company_profile, company_data)
-    table_company_fundamentals = make_table(company_fundamentals, company_data)
-    table_company_stock = make_table(company_stock, company_data)
+    table_company_information = make_text_table(company_information, company_data)
+    table_company_profile = make_text_table(company_profile, company_data)
+    table_company_fundamentals = make_numbers_table(company_fundamentals, company_data)
+    table_company_stock = make_numbers_table(company_stock, company_data)
     return (
-        layout_company_information,
-        company_data.get("longBusinessSummary"),
+        company_data.get("longName"),
+        table_company_information,
         table_company_profile,
+        company_data.get("longBusinessSummary"),
         table_company_fundamentals,
         table_company_stock,
     )
@@ -233,7 +232,6 @@ def update(stock_symbol):
     Input("stock-ticker", "n_intervals"),
 )
 def update(stock_symbol, intervall):
-    print(ctx.triggered_id)
     data = yahoo_finance.get_current_company_price(stock_symbol.split("=")[1])
     data.reset_index(inplace=True)
     return make_stock_plot(data)

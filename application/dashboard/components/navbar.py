@@ -23,7 +23,6 @@ links = [
 
 
 def make_nav_links():
-    # print(dash.get_app())
     return dmc.List(
         [
             html.Li(html.A(f"{page[0]}", href=page[1], className="nav-link"))

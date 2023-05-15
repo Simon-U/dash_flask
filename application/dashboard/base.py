@@ -12,6 +12,14 @@ def make_base_layout(app):
                 "Grid": {
                     "style": {
                         "root": {
+                            "padding": "0px",
+                            "margin": "0px",
+                        }
+                    },
+                },
+                "Col": {
+                    "style": {
+                        "root": {
                             "padding": "0em",
                         }
                     },
