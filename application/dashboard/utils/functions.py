@@ -3,6 +3,7 @@ import importlib
 import pandas as pd
 import plotly.express as px
 import pandas as pd
+from flask import current_app
 
 import dash_mantine_components as dmc
 from dash import html
@@ -292,12 +293,12 @@ def create_stocks_table(df):
     rows = [
         html.Tr(
             [
-                html.Td(html.A(cell, href="/dash/new_target", target="_blank"))
+                html.Td(html.A(cell, href=f'{current_app.config.get("URL_DASH")[:-1]}{current_app.config.get("DASH_STOCK_DETAIL")}?stock={df.loc[row_id+1, "Symbol"]}', target="_blank"))
                 if ind == 0
                 else html.Td(cell)
                 for ind, cell in enumerate(row)
             ]
         )
-        for row in values
+        for row_id, row in enumerate(values)
     ]
     return [html.Thead(header), html.Tbody(rows)]

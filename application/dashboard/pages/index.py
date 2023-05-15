@@ -12,14 +12,14 @@ from ..utils.functions import (
 )
 from ...API.external_API import yahoo_finance
 
-stocks = DashBlueprint()
+index_bp = DashBlueprint()
 
-index = ["^DJI", "^GSPC", "^NDX", "^GDAXI"]
+index_values = ["^DJI", "^GSPC", "^NDX", "^GDAXI"]
 
-stocks.layout = dmc.Grid(
+index_bp.layout = dmc.Grid(
     [
         dmc.ChipGroup(
-            make_indice_summary(index),
+            make_indice_summary(index_values),
             id="chip-index",
             style={
                 "display": "flex",
@@ -41,7 +41,7 @@ stocks.layout = dmc.Grid(
                     dmc.Select(
                         id="select-index",
                         label="Select a index",
-                        data=yahoo_finance.get_indices(index),
+                        data=yahoo_finance.get_indices(index_values),
                     ),
                     dmc.Space(h=20),
                     dmc.TransferList(
@@ -84,7 +84,7 @@ stocks.layout = dmc.Grid(
 )
 
 
-@stocks.callback(
+@index_bp.callback(
     Output("select-index", "value"),
     Output("chip-index", "value"),
     Input("select-index", "value"),
@@ -100,7 +100,7 @@ def syncro_chip_select(select_value, chip_value):
         return select_value, select_value
 
 
-@stocks.callback(
+@index_bp.callback(
     Output("transfer-list", "value"),
     Input("select-index", "value"),
     prevent_initial_call=True,
@@ -112,7 +112,7 @@ def populate_list(selected_index):
         return get_stock_list(selected_index)
 
 
-@stocks.callback(
+@index_bp.callback(
     Output("stocks-graph", "figure"),
     Output("company-table", "children", allow_duplicate=True),
     Output("notifications-container", "children"),
@@ -142,13 +142,13 @@ def update_graph(stocks_list):
         return ((make_plot(history)), create_stocks_table(company_data), message)
 
 
-@stocks.callback(
+@index_bp.callback(
     Output("notifications-container", "children", allow_duplicate=True),
     Input("transfer-list", "value"),
-    prevent_initial_call=True,
 )
 def update_graph(stocks_list):
     stock_list = stocks_list[1]
+
     if ctx.triggered_id is None:
         raise PreventUpdate
 

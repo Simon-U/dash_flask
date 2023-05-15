@@ -9,7 +9,8 @@ from dash_extensions.enrich import DashProxy
 from application.auth.decorators import login_required
 from .base import make_base_layout
 from .pages.overview import overview
-from .pages.stocks import stocks
+from .pages.index import index_bp
+from .pages.stock_detail import stock_detail_bp
 
 
 def protect_dashviews(dash_app):
@@ -51,12 +52,20 @@ def create_dashapp(server):
         name="co2 onboard Dashboard",
     )
 
-    stocks.register(
+    index_bp.register(
         app,
-        "pages.stocks",
+        "pages.index",
         path=current_app.config["DASH_INDEX"],
         title="Index overview",
         name="Index overview",
+    )
+    
+    stock_detail_bp.register(
+        app,
+        "pages.stock_detail",
+        path=current_app.config["DASH_STOCK_DETAIL"],
+        title="Stock detail",
+        name="Stock detail",
     )
 
     app.layout = make_base_layout(app)
