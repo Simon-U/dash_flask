@@ -13177,3 +13177,12 @@ select.form-control[multiple] {
 .mantine-TransferList-transferListItems {
   height: 300px !important;
 }
+
+a:hover {
+  color: var(--mes_blue);
+  text-decoration: none;
+}
+
+.mantine-n6jfnb:hover {
+  background-color: var(--mes_grey);
+}
