@@ -385,7 +385,11 @@ def make_numbers_table(desired_values, data_dict):
         html.Tr(
             [
                 html.Td(desired_values.get(key)),
-                (html.Td(data_dict.get(key)) if data_dict.get(key) > 0 else html.Td()),
+                (
+                    html.Td(f"{data_dict.get(key):,}")
+                    if data_dict.get(key) > 0
+                    else html.Td()
+                ),
             ]
         )
         for key in list(desired_values.keys())

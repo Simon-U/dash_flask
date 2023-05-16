@@ -45,8 +45,8 @@ def create_dashapp(server):
         app,
         "pages.overview",
         path=current_app.config["DASH_HOME"],
-        title="co2 onboard Dashboard",
-        name="co2 onboard Dashboard",
+        title="co2 Dashboard",
+        name="co2onboard",
     )
 
     index_bp.register(
@@ -54,7 +54,7 @@ def create_dashapp(server):
         "pages.index",
         path=current_app.config["DASH_INDEX"],
         title="Index overview",
-        name="Index overview",
+        name="indexOverview",
     )
 
     stock_detail_bp.register(
@@ -62,7 +62,7 @@ def create_dashapp(server):
         "pages.stock_detail",
         path=current_app.config["DASH_STOCK_DETAIL"],
         title="Stock detail",
-        name="Stock detail",
+        name="stockDetail",
     )
 
     app.layout = make_base_layout(app)

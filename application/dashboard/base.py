@@ -1,8 +1,11 @@
 import dash_mantine_components as dmc
 from dash import html, page_container, dcc
+from flask import session, current_app
 
 from .components.navbar import navbar
+from .components.navbar_new import navbar_new
 from .components.modalPassword import modalPasswordChange
+from .utils.functions import get_icon
 
 
 def make_base_layout(app):
@@ -18,7 +21,7 @@ def make_base_layout(app):
                     },
                 },
                 "Col": {
-                    "style": {
+                    "styles": {
                         "root": {
                             "padding": "0em",
                         }
@@ -55,14 +58,50 @@ def make_base_layout(app):
         children=dmc.NotificationsProvider(
             [
                 dcc.Location(id="url", refresh=False),
+                dcc.Interval(id="stock-ticker", interval=30000, disabled=True),
                 dmc.Grid(
                     children=[
                         modalPasswordChange,
-                        navbar.embed(app),
+                        navbar_new.embed(app),
                         html.Div(id="notifications-container"),
                         html.Div(
+                            [
+                                dmc.Title(id="dashboard-title", order=1),
+                                html.Div(
+                                    [
+                                        dmc.NavLink(
+                                            label="Overview",
+                                            icon=get_icon(icon="mdi:molecule-co2"),
+                                            fw="bold",
+                                            w="10em",
+                                            href=current_app.config.get("URL_DASH"),
+                                        ),
+                                        dmc.NavLink(
+                                            label="Index Overview",
+                                            fw="bold",
+                                            icon=get_icon(
+                                                icon="arcticons:stockswidget"
+                                            ),
+                                            w="10em",
+                                            href=f'{current_app.config.get("URL_DASH")[:-1]}{current_app.config.get("DASH_INDEX")}',
+                                        ),
+                                    ],
+                                    style={
+                                        "display": "flex",
+                                        "flex-direction": "row",
+                                        "justify-content": "flex-start",
+                                    },
+                                ),
+                            ],
+                            style={
+                                "padding": "2em 2em 2em 100px",
+                            },
+                        ),
+                        html.Div(
                             page_container,
-                            style={"padding": "2em"},
+                            style={
+                                "margin": "2em 2em 2em 100px",
+                            },
                         ),
                     ],
                     gutter="xl",

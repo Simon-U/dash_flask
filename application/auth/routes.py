@@ -355,10 +355,10 @@ def change_password(token):
     )
 
 
-@auth_bp.route(current_app.config["URL_PRIVACY_POLICY"], methods=["GET", "POST"])
-def privacy_policy():
-    return render_template(
-        "privacy_policy.html",
-        title="Privacy Policy",
-        body="Privacy Policy",
-    )
+# @auth_bp.route(current_app.config["URL_PRIVACY_POLICY"], methods=["GET", "POST"])
+# def privacy_policy():
+#    return render_template(
+#        "privacy_policy.html",
+#        title="Privacy Policy",
+#        body="Privacy Policy",
+#    )

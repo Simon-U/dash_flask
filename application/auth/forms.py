@@ -31,7 +31,6 @@ class SignupForm(FlaskForm):
             DataRequired(),
         ],
     )
-    is_admin = BooleanField("Is admin")
     password = PasswordField(
         "Password",
         validators=[
@@ -56,7 +55,7 @@ class SignupForm(FlaskForm):
         validators=[DataRequired()],
     )
     data_consent = BooleanField(
-        "Did you read and consent to our",
+        "Did you read and consent to our Policy",
         validators=[DataRequired()],
     )
 

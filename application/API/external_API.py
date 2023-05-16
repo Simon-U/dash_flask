@@ -39,7 +39,6 @@ class yahoo_finance:
         stock = yf.Ticker(symbol)
         close = stock.info.get("bid")
         stock_info = stock.info
-        # print(stock.info)
         stock_hist = stock.history(
             period="1d",
         )
@@ -68,7 +67,6 @@ class yahoo_finance:
             "symbol": stock_info.get("symbol"),
             "traded": traded,
         }
-        # print(values)
         return values
 
     def get_history_data(stock_list):
@@ -102,7 +100,6 @@ class yahoo_finance:
             "Currency",
         ]
         data = pd.DataFrame(columns=columns)
-        print(stock_list)
         if len(stock_list) == 1:
             company_data = [
                 tickers.tickers[stock_list[0].get("value")].info.get(item)
