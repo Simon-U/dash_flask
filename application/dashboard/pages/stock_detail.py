@@ -7,6 +7,7 @@ from ..utils.functions import (
     make_stock_plot,
     make_text_table,
     make_numbers_table,
+    make_officer_table,
 )
 from ...API.external_API import yahoo_finance
 
@@ -31,22 +32,26 @@ stock_detail_bp.layout = dmc.Grid(
                     radius="lg",
                     p="xs",
                 ),
-                # dmc.Paper(
-                #    [
-                #        dmc.Table(
-                #            verticalSpacing="xs",
-                #            horizontalSpacing="xs",
-                #            id="company-profile-table",
-                #        )
-                #    ],
-                #    radius="lg",
-                #    p="xs",
-                # ),
             ],
             style={
-                "display": "flex",
-                "flex-flow": "row wrap",
-                "gap": "10px",
+                "padding": "0px",
+                "margin": "0",
+            },
+            span=2,
+        ),
+        dmc.Col(
+            dmc.Paper(
+                [
+                    dmc.Table(
+                        verticalSpacing="xs",
+                        horizontalSpacing="xs",
+                        id="company-officer-table",
+                    )
+                ],
+                radius="lg",
+                p="xs",
+            ),
+            style={
                 "padding": "0px",
                 "margin": "0",
             },
@@ -58,10 +63,9 @@ stock_detail_bp.layout = dmc.Grid(
                     [dcc.Graph(id="company-graph")],
                     radius="lg",
                     p="xs",
-                    style={"min-height": "455px"},
                 ),
             ],
-            span=7,
+            span=5,
             style={
                 "padding": "0px",
                 "margin": "0px",
@@ -121,8 +125,9 @@ stock_detail_bp.layout = dmc.Grid(
             span=3,
         ),
     ],
-    gutter="xl",
-    align="start",
+    gutter="sm",
+    grow=True,
+    align="stretch",
     style={
         "gap": "10px",
     },
@@ -132,7 +137,7 @@ stock_detail_bp.layout = dmc.Grid(
 @stock_detail_bp.callback(
     Output("company-name", "children"),
     Output("company-information-table", "children"),
-    # Output("company-profile-table", "children"),
+    Output("company-officer-table", "children"),
     Output("company-description", "children"),
     Output("company-fundemantals", "children"),
     Output("company-stock", "children"),
@@ -182,9 +187,6 @@ def update(stock_symbol):
         "website": "Website",
         "fullTimeEmployees": "Employees",
     }
-    company_profile = {
-        # "companyOfficers": "Officers",
-    }
 
     company_fundamentals = {
         "enterpriseValue": "Enterprise Value",
@@ -212,13 +214,13 @@ def update(stock_symbol):
         list(value_inputs.keys()), stock_symbol.split("=")[1]
     )
     table_company_information = make_text_table(company_information, company_data)
-    # table_company_profile = make_text_table(company_profile, company_data)
+    table_company_officers = make_officer_table(company_data)
     table_company_fundamentals = make_numbers_table(company_fundamentals, company_data)
     table_company_stock = make_numbers_table(company_stock, company_data)
     return (
         company_data.get("longName"),
         table_company_information,
-        # table_company_profile,
+        table_company_officers,
         company_data.get("longBusinessSummary"),
         table_company_fundamentals,
         table_company_stock,

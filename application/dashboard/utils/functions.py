@@ -371,6 +371,17 @@ def make_text_table(desired_values, data_dict):
     return [html.Tbody(rows)]
 
 
+def make_officer_table(data_dict):
+    """_summary_"""
+    # sprint(data_dict.get(desired_values.keys()))
+    rows = [
+        html.Tr([html.Td(officer[1]), html.Td(officer[0])])
+        for officer in data_dict.get("companyOfficers")
+    ]
+
+    return [html.Tbody(rows)]
+
+
 def make_numbers_table(desired_values, data_dict):
     """_summary_
     Function to make a general table with data. We skip 0 here

@@ -37,6 +37,10 @@ overview.layout = dmc.Grid(
                 radius="lg",
                 p="xs",
             ),
+            style={
+                "padding": "0px",
+                "margin": "0px",
+            },
             span=2,
         ),
         dmc.Col(
@@ -45,11 +49,19 @@ overview.layout = dmc.Grid(
                 radius="lg",
                 p="xs",
             ),
-            span=10,
+            style={
+                "padding": "0px",
+                "margin": "0px",
+            },
+            span=9,
         ),
     ],
-    gutter="xl",
-    style={"padding-bottom": "60px"},
+    gutter="sm",
+    grow=True,
+    align="stretch",
+    style={
+        "gap": "10px",
+    },
 )
 
 

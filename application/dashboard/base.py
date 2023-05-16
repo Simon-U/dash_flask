@@ -100,7 +100,7 @@ def make_base_layout(app):
                         html.Div(
                             page_container,
                             style={
-                                "margin": "2em 2em 2em 100px",
+                                "margin": "2em 2em 2em 110px",
                             },
                         ),
                     ],
@@ -108,7 +108,6 @@ def make_base_layout(app):
                     style={
                         "margin": "0",
                         "max-width": "100%",
-                        "background-color": "none",
                     },
                 ),
             ],

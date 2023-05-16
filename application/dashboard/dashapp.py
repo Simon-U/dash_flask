@@ -61,7 +61,7 @@ def create_dashapp(server):
         app,
         "pages.stock_detail",
         path=current_app.config["DASH_STOCK_DETAIL"],
-        title="Stock detail",
+        title="Company detail",
         name="stockDetail",
     )
 

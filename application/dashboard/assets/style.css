@@ -16,9 +16,10 @@
 :root {
   --mes_red: #D44136;
   --mes_grey: #F5F5F5;
-  --mes_blue: #074F80;
-  --mes_blue_rgb: 7, 79, 128;
+  --mes_blue: #0693e3;
+  --mes_blue_rgb: 6, 147, 227;
   --mes_red_rgb: 212, 65, 54;
+  --mes_grey_rgb: 245, 245, 245;
 
   /**/
   --blue: #2196f3;
@@ -85,7 +86,7 @@ body {
   line-height: 1.5;
   color: #444;
   text-align: left;
-  background-color: #fff;
+  background-color: var(--mes_grey);
 }
 
 [tabindex="-1"]:focus:not(:focus-visible) {

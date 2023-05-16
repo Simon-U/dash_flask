@@ -84,7 +84,7 @@ def change_title(path):
     ):
         return "Index overview", True
     else:
-        return "Company detail", False
+        return "Company fundamentals", False
 
 
 @navbar_new.callback(

@@ -31,10 +31,9 @@ index_bp.layout = dmc.Grid(
                 "flex-wrap": "wrap",
                 "height": "auto",
                 "min-height": "2em",
-                "margin-bottom": "5em",
+                "margin-bottom": "2em",
             },
         ),
-        dmc.Space(h=40),
         dmc.Col(
             dmc.Paper(
                 [
@@ -54,6 +53,10 @@ index_bp.layout = dmc.Grid(
                 p="xs",
                 style={"min-height": "470px"},
             ),
+            style={
+                "padding": "0px",
+                "margin": "0px",
+            },
             span=2,
         ),
         dmc.Col(
@@ -67,6 +70,10 @@ index_bp.layout = dmc.Grid(
                 p="xs",
                 style={"min-height": "470px"},
             ),
+            style={
+                "padding": "0px",
+                "margin": "0px",
+            },
             span=5,
         ),
         dmc.Col(
@@ -76,11 +83,19 @@ index_bp.layout = dmc.Grid(
                 p="xs",
                 style={"min-height": "455px"},
             ),
+            style={
+                "padding": "0px",
+                "margin": "0px",
+            },
             span=5,
         ),
     ],
-    gutter="md",
-    style={"padding-bottom": "60px"},
+    gutter="sm",
+    grow=True,
+    align="stretch",
+    style={
+        "gap": "10px",
+    },
 )
 
 
