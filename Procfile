@@ -1,1 +1,1 @@
-web: gunicorn wsgi:app WEB_CONCURRENCY=1
+web: gunicorn wsgi:app --preload
