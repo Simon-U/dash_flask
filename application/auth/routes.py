@@ -30,7 +30,7 @@ def get_dict(value):
     if value is dict:
         return value
     else:
-        return json.loads(dict)
+        return json.loads(value)
 
 def update_preferences(user):
     """_summary_
