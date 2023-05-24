@@ -47,7 +47,7 @@ def update_preferences(user):
         current_preferences = {}
 
     inital_preferences = {
-        list(get_dict(pref[0]).keys())[0]: list(get_dictF(pref[0]).values())[0]
+        list(get_dict(pref[0]).keys())[0]: list(get_dict(pref[0]).values())[0]
         for pref in co2model.query.with_entities(co2model.inital_preferences).all()
     }
 
