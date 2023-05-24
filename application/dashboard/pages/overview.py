@@ -22,7 +22,7 @@ overview.layout = dmc.Grid(
                         orientation="vertical",
                         id="tabs",
                     ),
-                    dmc.Space(h=20),
+                    dmc.Space(h=25),
                     dmc.Button(
                         "Save Settings",
                         id="save-settings",
