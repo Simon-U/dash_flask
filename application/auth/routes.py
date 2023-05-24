@@ -26,6 +26,11 @@ auth_bp = Blueprint(
     "auth_bp", __name__, template_folder="templates", static_folder="application/static"
 )
 
+def get_dict(value):
+    if value is dict:
+        return dict
+    else:
+        return json.loads(dict)
 
 def update_preferences(user):
     """_summary_
@@ -42,7 +47,7 @@ def update_preferences(user):
         current_preferences = {}
 
     inital_preferences = {
-        list(json.loads(pref[0]).keys())[0]: list(json.loads(pref[0]).values())[0]
+        list(get_dict(pref[0]).keys())[0]: list(get_dictF(pref[0]).values())[0]
         for pref in co2model.query.with_entities(co2model.inital_preferences).all()
     }
 
@@ -210,7 +215,7 @@ def signup():
                 co2model.inital_preferences
             ).all()
             preferences_json = {
-                list(pref[0].keys())[0]: list(pref[0].values())[0]
+                list(get_dict(pref[0]).keys())[0]: list(get_dict(pref[0]).values())[0]
                 for pref in preferences
             }
             user = User(
