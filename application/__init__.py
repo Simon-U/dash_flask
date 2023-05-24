@@ -78,7 +78,7 @@ def create_app():
         app.register_blueprint(auth.auth_bp)
 
         # Create Database Models
-        #db.create_all()
+        db.create_all()
         """
         if co2model.query.filter_by(name="EU Norm 1").first() is None:
             co2mod = co2model(
