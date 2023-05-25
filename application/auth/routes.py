@@ -26,11 +26,13 @@ auth_bp = Blueprint(
     "auth_bp", __name__, template_folder="templates", static_folder="application/static"
 )
 
+
 def get_dict(value):
     if value is dict:
         return value
     else:
         return json.loads(value)
+
 
 def update_preferences(user):
     """_summary_
@@ -222,7 +224,7 @@ def signup():
                 first_name=form.first_name.data,
                 last_name=form.last_name.data,
                 email=form.email.data,
-                is_admin=form.is_admin.data,
+                is_admin=False,
                 verified=False,
                 created=datetime.datetime.now(),
                 preferences=preferences_json,
