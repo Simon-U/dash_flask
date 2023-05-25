@@ -5,7 +5,6 @@ from dash_extensions.enrich import DashProxy
 
 from application.auth.decorators import login_required
 from .base import make_base_layout
-from .pages.overview import overview
 from .pages.index import index_bp
 from .pages.stock_detail import stock_detail_bp
 
