@@ -26,7 +26,6 @@ class User(UserMixin, db.Model):
     )
     created = db.Column(db.DateTime, index=False, unique=False, nullable=False)
     last_login = db.Column(db.DateTime, index=False, unique=False, nullable=True)
-    preferences = db.Column(db.JSON, nullable=True)
 
     def set_password(self, password):
         """Create hashed password."""
@@ -38,12 +37,3 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return "<User {}>".format(self.email)
-
-
-class co2model(db.Model):
-    __tablename__ = "co2model"
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False, unique=False)
-    inital_preferences = db.Column(db.JSON, nullable=True)
-    path_datafile = db.Column(db.String(200), unique=False, nullable=False)
-    path_processingfile = db.Column(db.String(200), unique=False, nullable=False)

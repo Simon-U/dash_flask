@@ -21,25 +21,6 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 mail = RedMail()
 
-test_preferences = {
-    "EU Norm 1": {
-        "Technologie Readiness Level": "5",
-        "verwendeter Kraftstoff": "6",
-        "behandelte Rauchgasmenge": "7",
-        "CO2 Rauchgaskonzentration": "3",
-        "Anlage Eingangsdruck": "4",
-        "Eingangs Prozesstemperatur": "5",
-        "CO2 Reinheit": "3",
-        "CO2 Abscheiderate": "7",
-        "CO2 Temperatur vor Speicherung": "4",
-        "Energiebedarf elektrisch": "9",
-        "Energiebedarf thermisch": "7",
-        "Prozessmittelverbrauch": "3",
-        "Abgasvorbehandlung": "10",
-        "Platzbedarf": "7",
-    }
-}
-
 
 admin_manager = Admin(template_mode="bootstrap4", index_view=MyAdminIndexView())
 path = op.join(op.dirname(__file__), "data")
@@ -68,27 +49,15 @@ def create_app():
         from .auth import routes as auth
 
         # Register admin views for managing user and uploading files
-        from .models import User, co2model
+        from .models import User
 
         admin_manager.add_view(customModelView(User, db.session))
-        admin_manager.add_view(customModelView(co2model, db.session))
-        admin_manager.add_view(customFileAdmin(path, name="Excel Tables"))
 
         # Register Blueprints, which are layouts
         app.register_blueprint(auth.auth_bp)
 
         # Create Database Models
         db.create_all()
-
-        if co2model.query.filter_by(name="EU Norm 1").first() is None:
-            co2mod = co2model(
-                name="EU Norm 1",
-                inital_preferences=json.dumps(test_preferences),
-                path_datafile="01_aussichtsreichsteTechnologien.xlsx",
-                path_processingfile="dataProcessing.py",
-            )
-            db.session.add(co2mod)
-            db.session.commit()
 
         if (
             User.query.filter_by(email=current_app.config["ADMIN_EMAIL"]).first()
@@ -98,27 +67,12 @@ def create_app():
                 first_name=current_app.config["ADMIN_FIRST_NAME"],
                 last_name=current_app.config["ADMIN_LAST_NAME"],
                 email=current_app.config["ADMIN_EMAIL"],
-                preferences=json.dumps(test_preferences),
                 is_admin=True,
                 verified=True,
                 created=datetime.datetime.now(),
                 data_consent=True,
             )
             user.set_password(current_app.config["ADMIN_PASSWORD"])
-            db.session.add(user)
-            db.session.commit()
-
-            user = User(
-                first_name="Test",
-                last_name="Test",
-                email="test@test.com",
-                preferences=json.dumps(test_preferences),
-                is_admin=False,
-                verified=True,
-                created=datetime.datetime.now(),
-                data_consent=True,
-            )
-            user.set_password("userTest3!")
             db.session.add(user)
             db.session.commit()
 

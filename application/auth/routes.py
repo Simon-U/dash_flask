@@ -17,7 +17,7 @@ from flask import (
 from flask_login import login_required, logout_user, current_user, login_user
 
 from application import login_manager
-from application.models import User, co2model, db
+from application.models import User, db
 from .forms import LoginForm, SignupForm, ResetPasswordForm
 from .. import mail
 
@@ -25,59 +25,6 @@ from .. import mail
 auth_bp = Blueprint(
     "auth_bp", __name__, template_folder="templates", static_folder="application/static"
 )
-
-
-def get_dict(value):
-    if type(value) is dict:
-        return value
-    else:
-        return json.loads(value)
-
-
-def update_preferences(user):
-    """_summary_
-    This function checks if the user has all the inital preferences or removes unused preferences
-    Args:
-        user (object): User object from database
-    """
-
-    current_preferences = get_dict(
-        User.query.with_entities(User.preferences).filter_by(id=user.id).first()[0]
-    )
-
-    if current_preferences is None:
-        current_preferences = {}
-
-    inital_preferences = {
-        list(get_dict(pref[0]).keys())[0]: list(get_dict(pref[0]).values())[0]
-        for pref in co2model.query.with_entities(co2model.inital_preferences).all()
-    }
-
-    if inital_preferences is None:
-        inital_preferences = {}
-    try:
-        current_keys = list(current_preferences.keys())
-    except:
-        current_keys = []
-
-    try:
-        inital_keys = list(inital_preferences.keys())
-    except:
-        inital_keys = []
-
-    # Check if user is missing preferences for one model
-    for key in inital_keys:
-        if key not in current_keys:
-            current_preferences[key] = inital_preferences.get(key)
-            user.preferences = current_preferences
-            db.session.commit()
-
-    # Check if user has preferences for a model which does not exists anymore
-    for key in current_keys:
-        if key not in inital_keys:
-            del current_preferences[key]
-            user.preferences = current_preferences
-            db.session.commit()
 
 
 def flash_errors(form):
@@ -118,7 +65,6 @@ def login():
     loginForm = LoginForm()
 
     if current_user.is_authenticated:
-        update_preferences(current_user)
         # Log the new last login
         current_user.last_login = datetime.datetime.now()
         db.session.commit()
@@ -148,7 +94,7 @@ def login():
             .filter_by(email=loginForm.email.data)
             .first()
         )[0]
-        update_preferences(user)
+
         # Check if the user is verified
         if not user.verified:
             flash(
@@ -213,13 +159,6 @@ def signup():
         flash("A user already exists with that email address.", category="warning")
 
         if existing_user is None:
-            preferences = co2model.query.with_entities(
-                co2model.inital_preferences
-            ).all()
-            preferences_json = {
-                list(get_dict(pref[0]).keys())[0]: list(get_dict(pref[0]).values())[0]
-                for pref in preferences
-            }
             user = User(
                 first_name=form.first_name.data,
                 last_name=form.last_name.data,
@@ -227,7 +166,6 @@ def signup():
                 is_admin=False,
                 verified=False,
                 created=datetime.datetime.now(),
-                preferences=preferences_json,
             )
             user.set_password(form.password.data)
             db.session.add(user)
