@@ -10,7 +10,6 @@
 6. Start the application `gunicorn wsgi:app`
 7. Stop the server with Ctrl + C
 8. Start again `gunicorn -w 2 wsgi:app`
-9. Login with admin@admin.com and adminTest3!
 
 The restart currently needs to be done to first initialise the database. If multiple workers are started directly, they collide while initialising the database.
 
