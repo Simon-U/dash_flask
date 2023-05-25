@@ -28,7 +28,6 @@ auth_bp = Blueprint(
 
 
 def get_dict(value):
-    print(type(value))
     if type(value) is dict:
         return value
     else:
