@@ -41,7 +41,7 @@ def update_preferences(user):
         user (object): User object from database
     """
 
-    current_preferences = json.loads(
+    current_preferences = get_dict(
         User.query.with_entities(User.preferences).filter_by(id=user.id).first()[0]
     )
 
