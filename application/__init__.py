@@ -79,7 +79,7 @@ def create_app():
 
         # Create Database Models
         db.create_all()
-        
+
         if co2model.query.filter_by(name="EU Norm 1").first() is None:
             co2mod = co2model(
                 name="EU Norm 1",
@@ -107,7 +107,21 @@ def create_app():
             user.set_password(current_app.config["ADMIN_PASSWORD"])
             db.session.add(user)
             db.session.commit()
-        
+
+            user = User(
+                first_name="Test",
+                last_name="Test",
+                email="test@test.com",
+                preferences=json.dumps(test_preferences),
+                is_admin=False,
+                verified=True,
+                created=datetime.datetime.now(),
+                data_consent=True,
+            )
+            user.set_password("userTest3!")
+            db.session.add(user)
+            db.session.commit()
+
         # Integrate the dasg application
         from .dashboard.dashapp import create_dashapp
 
