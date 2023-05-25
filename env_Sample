@@ -1,0 +1,17 @@
+ENVIRONMENT = "development"
+FLASK_APP = "Dashboard"
+FLASK_DEBUG = False
+SECRET_KEY = 
+DATABASE_URI = 'sqlite:///database.db'
+
+EMAIL_HOST = 
+EMAIL_PORT = 587
+EMAIL_USERNAME = 
+EMAIL_PASSWORD = 
+EMAIL_SENDER = 'dont_reply@email.com'
+FLASK_ADMIN_SWATCH = 'materia'
+
+ADMIN_FIRST_NAME = 
+ADMIN_LAST_NAME = 
+ADMIN_EMAIL = 
+ADMIN_PASSWORD = 
