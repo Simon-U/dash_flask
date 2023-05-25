@@ -41,18 +41,10 @@ def create_dashapp(server):
     app.title = "Dashboard"
     protect_dashviews(app)
 
-    overview.register(
-        app,
-        "pages.overview",
-        path=current_app.config["DASH_HOME"],
-        title="co2 Dashboard",
-        name="co2onboard",
-    )
-
     index_bp.register(
         app,
         "pages.index",
-        path=current_app.config["DASH_INDEX"],
+        path=current_app.config["DASH_HOME"],
         title="Index overview",
         name="indexOverview",
     )

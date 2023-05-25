@@ -29,7 +29,7 @@ navbar_new.layout = dmc.Navbar(
     },
     children=[
         dmc.Title(
-            "QDT",
+            "PID",
             order=2,
             transform="uppercase",
             variant="gradient",
@@ -77,11 +77,6 @@ navbar_new.layout = dmc.Navbar(
 )
 def change_title(path):
     if path == current_app.config.get("URL_DASH"):
-        return "Co2 Overview", True
-    elif (
-        path
-        == f'{current_app.config.get("URL_DASH")[:-1]}{current_app.config.get("DASH_INDEX")}'
-    ):
         return "Index overview", True
     else:
         return "Company fundamentals", False

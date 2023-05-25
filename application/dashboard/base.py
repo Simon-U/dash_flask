@@ -70,20 +70,13 @@ def make_base_layout(app):
                                 html.Div(
                                     [
                                         dmc.NavLink(
-                                            label="Overview",
-                                            icon=get_icon(icon="mdi:molecule-co2"),
-                                            fw="bold",
-                                            w="10em",
-                                            href=current_app.config.get("URL_DASH"),
-                                        ),
-                                        dmc.NavLink(
                                             label="Index Overview",
-                                            fw="bold",
                                             icon=get_icon(
                                                 icon="arcticons:stockswidget"
                                             ),
+                                            fw="bold",
                                             w="10em",
-                                            href=f'{current_app.config.get("URL_DASH")[:-1]}{current_app.config.get("DASH_INDEX")}',
+                                            href=current_app.config.get("URL_DASH"),
                                         ),
                                     ],
                                     style={
